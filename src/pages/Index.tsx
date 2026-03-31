@@ -127,12 +127,12 @@ const Index = () => {
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
-          <Button variant="secondary" size="icon" onClick={reset} className="rounded-full h-12 w-12">
+          <Button variant="secondary" size="icon" onClick={() => { reset(); resetSent(); }} className="rounded-full h-12 w-12">
             <RotateCcw className="w-5 h-5" />
           </Button>
 
           {isFinished ? (
-            <Button variant="danger" size="lg" onClick={reset} className="h-16 w-16 rounded-full p-0">
+            <Button variant="danger" size="lg" onClick={() => { reset(); resetSent(); }} className="h-16 w-16 rounded-full p-0">
               <RotateCcw className="w-6 h-6" />
             </Button>
           ) : isRunning ? (
