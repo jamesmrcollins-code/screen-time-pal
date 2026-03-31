@@ -92,7 +92,7 @@ const Index = () => {
       <header className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <Timer className="w-6 h-6 text-primary" />
-          <h1 className="text-xl font-extrabold text-foreground font-display">ScreenTime</h1>
+          <h1 className="text-xl font-extrabold text-foreground font-display">ScreenTime Pal</h1>
         </div>
         <div className="flex items-center gap-1">
           <ThemeToggle />
