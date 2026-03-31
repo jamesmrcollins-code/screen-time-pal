@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimeSetter } from "@/components/TimeSetter";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer } from "lucide-react";
+import { useUsageLog } from "@/hooks/useUsageLog";
+import { useNavigate } from "react-router-dom";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
 
 const Index = () => {
   const {
@@ -20,10 +22,22 @@ const Index = () => {
     requestNotificationPermission,
   } = useScreenTimer();
 
+  const { addUsage } = useUsageLog();
+  const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
+
+  // Track usage: log consumed seconds each second while running
+  const prevRemaining = useRef(remainingSeconds);
+  useEffect(() => {
+    if (isRunning && prevRemaining.current > remainingSeconds) {
+      const consumed = prevRemaining.current - remainingSeconds;
+      addUsage(consumed);
+    }
+    prevRemaining.current = remainingSeconds;
+  }, [remainingSeconds, isRunning, addUsage]);
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
@@ -38,14 +52,24 @@ const Index = () => {
           <Timer className="w-6 h-6 text-primary" />
           <h1 className="text-xl font-bold text-foreground">ScreenTime</h1>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowSettings(!showSettings)}
-          className="text-muted-foreground"
-        >
-          <Settings className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/stats")}
+            className="text-muted-foreground"
+          >
+            <BarChart3 className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSettings(!showSettings)}
+            className="text-muted-foreground"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+        </div>
       </header>
 
       {/* Main */}
