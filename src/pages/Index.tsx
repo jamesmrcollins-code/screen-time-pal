@@ -37,8 +37,11 @@ const Index = () => {
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
   const { rewards, markTodayUnderLimit } = useRewards(activeId);
   const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
+  const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
+  const { startAlarm, stopAlarm } = useAlarm();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
