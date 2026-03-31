@@ -7,6 +7,8 @@ import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
 import { RewardsBadge } from "@/components/RewardsBadge";
 import { ScheduleSettings as ScheduleSettingsUI } from "@/components/ScheduleSettings";
+import { LockScreenSettings } from "@/components/LockScreenSettings";
+import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
@@ -16,6 +18,8 @@ import { usePinLock } from "@/hooks/usePinLock";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
+import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
+import { useAlarm } from "@/hooks/useAlarm";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,8 +37,11 @@ const Index = () => {
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
   const { rewards, markTodayUnderLimit } = useRewards(activeId);
   const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
+  const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
+  const { startAlarm, stopAlarm } = useAlarm();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
@@ -67,14 +74,21 @@ const Index = () => {
     if (isFinished) checkSms(0);
   }, [isFinished, checkSms]);
 
-  // Mark reward if timer finishes (time's up = they used all their time, which is the limit)
-  // We reward staying UNDER limit — so if timer still has time when day ends, that's good
-  // For now, let parent manually mark or auto-mark if not finished by end of session
+  // Lock screen & alarm on finish
+  const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
-    if (!isFinished && !isRunning && remainingSeconds > 0 && progress < 1) {
-      // They stopped early — reward them
+    if (isFinished && !lockAlarmTriggeredRef.current) {
+      lockAlarmTriggeredRef.current = true;
+      if (lockSettings.lockOnZero && hasPin()) setIsScreenLocked(true);
+      if (lockSettings.alarmOnZero) startAlarm();
     }
-  }, [isFinished, isRunning, remainingSeconds, progress]);
+    if (!isFinished) lockAlarmTriggeredRef.current = false;
+  }, [isFinished, lockSettings, hasPin, startAlarm]);
+
+  const handleLockScreenUnlock = () => {
+    setIsScreenLocked(false);
+    stopAlarm();
+  };
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
@@ -87,6 +101,15 @@ const Index = () => {
   };
 
   return (
+    <>
+      {isScreenLocked && (
+        <TimesUpLockScreen
+          onUnlock={handleLockScreenUnlock}
+          verifyPin={verifyPin}
+          hasAlarm={lockSettings.alarmOnZero}
+          onStopAlarm={stopAlarm}
+        />
+      )}
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
@@ -228,6 +251,14 @@ const Index = () => {
             </div>
 
             <div className="border-t border-border pt-5">
+              <LockScreenSettings
+                settings={lockSettings}
+                onUpdate={updateLockSettings}
+                hasPinSet={hasPin()}
+              />
+            </div>
+
+            <div className="border-t border-border pt-5">
               <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
             </div>
           </div>
@@ -243,6 +274,7 @@ const Index = () => {
         )}
       </main>
     </div>
+    </>
   );
 };
 
