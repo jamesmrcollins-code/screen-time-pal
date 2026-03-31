@@ -251,6 +251,14 @@ const Index = () => {
             </div>
 
             <div className="border-t border-border pt-5">
+              <LockScreenSettings
+                settings={lockSettings}
+                onUpdate={updateLockSettings}
+                hasPinSet={hasPin()}
+              />
+            </div>
+
+            <div className="border-t border-border pt-5">
               <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
             </div>
           </div>
