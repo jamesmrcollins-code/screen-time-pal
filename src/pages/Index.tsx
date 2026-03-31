@@ -157,9 +157,14 @@ const Index = () => {
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border">
-            <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
-            <TimeSetter onSetTime={setTime} isRunning={isRunning} />
+          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6">
+            <div>
+              <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
+              <TimeSetter onSetTime={setTime} isRunning={isRunning} />
+            </div>
+            <div className="border-t border-border pt-5">
+              <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
+            </div>
           </div>
         )}
 
