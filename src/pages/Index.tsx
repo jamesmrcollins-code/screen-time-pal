@@ -99,6 +99,9 @@ const Index = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
             <BarChart3 className="w-5 h-5" />
           </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground">
+            <UserCircle className="w-5 h-5" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground">
             <Settings className="w-5 h-5" />
           </Button>
