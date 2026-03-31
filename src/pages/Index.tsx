@@ -17,7 +17,8 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const {
