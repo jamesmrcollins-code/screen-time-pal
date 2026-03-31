@@ -44,6 +44,20 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
+  // Check SMS thresholds
+  useEffect(() => {
+    if (isRunning) {
+      checkSms(remainingSeconds);
+    }
+  }, [remainingSeconds, isRunning, checkSms]);
+
+  // Also check at zero when finished
+  useEffect(() => {
+    if (isFinished) {
+      checkSms(0);
+    }
+  }, [isFinished, checkSms]);
+
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setNotifEnabled(granted);
