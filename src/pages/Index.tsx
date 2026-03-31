@@ -17,7 +17,8 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const {
@@ -97,6 +98,9 @@ const Index = () => {
           <ThemeToggle />
           <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
             <BarChart3 className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground">
+            <UserCircle className="w-5 h-5" />
           </Button>
           <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground">
             <Settings className="w-5 h-5" />
