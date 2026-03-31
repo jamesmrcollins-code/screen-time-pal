@@ -52,14 +52,24 @@ const Index = () => {
           <Timer className="w-6 h-6 text-primary" />
           <h1 className="text-xl font-bold text-foreground">ScreenTime</h1>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowSettings(!showSettings)}
-          className="text-muted-foreground"
-        >
-          <Settings className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/stats")}
+            className="text-muted-foreground"
+          >
+            <BarChart3 className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSettings(!showSettings)}
+            className="text-muted-foreground"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+        </div>
       </header>
 
       {/* Main */}
