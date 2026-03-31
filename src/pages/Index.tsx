@@ -22,10 +22,22 @@ const Index = () => {
     requestNotificationPermission,
   } = useScreenTimer();
 
+  const { addUsage } = useUsageLog();
+  const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
+
+  // Track usage: log consumed seconds each second while running
+  const prevRemaining = useRef(remainingSeconds);
+  useEffect(() => {
+    if (isRunning && prevRemaining.current > remainingSeconds) {
+      const consumed = prevRemaining.current - remainingSeconds;
+      addUsage(consumed);
+    }
+    prevRemaining.current = remainingSeconds;
+  }, [remainingSeconds, isRunning, addUsage]);
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
