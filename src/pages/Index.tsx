@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimeSetter } from "@/components/TimeSetter";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer } from "lucide-react";
+import { useUsageLog } from "@/hooks/useUsageLog";
+import { useNavigate } from "react-router-dom";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
 
 const Index = () => {
   const {
