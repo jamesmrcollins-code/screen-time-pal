@@ -6,12 +6,24 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Stats from "./pages/Stats.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+
+function ThemeInit() {
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <ThemeInit />
       <Toaster />
       <Sonner />
       <BrowserRouter>

@@ -3,64 +3,86 @@ import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimeSetter } from "@/components/TimeSetter";
 import { NotificationSettings } from "@/components/NotificationSettings";
+import { ProfileSelector } from "@/components/ProfileSelector";
+import { PinLock } from "@/components/PinLock";
+import { RewardsBadge } from "@/components/RewardsBadge";
+import { ScheduleSettings as ScheduleSettingsUI } from "@/components/ScheduleSettings";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
 import { useSmsNotifier } from "@/hooks/useSmsNotifier";
+import { usePinLock } from "@/hooks/usePinLock";
+import { useProfiles } from "@/hooks/useProfiles";
+import { useRewards } from "@/hooks/useRewards";
+import { useSchedule } from "@/hooks/useSchedule";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
 
 const Index = () => {
   const {
-    remainingSeconds,
-    isRunning,
-    isFinished,
-    mode,
-    progress,
-    start,
-    pause,
-    reset,
-    setTime,
-    changeMode,
-    requestNotificationPermission,
+    remainingSeconds, isRunning, isFinished, mode, progress,
+    start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
   const { addUsage } = useUsageLog();
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
+  const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
+  const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
+  const { rewards, markTodayUnderLimit } = useRewards(activeId);
+  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
 
-  // Track usage: log consumed seconds each second while running
+  const pinRequired = hasPin() && !isUnlocked;
+
+  // Auto-apply schedule limit
+  useEffect(() => {
+    const limit = getTodayLimit();
+    if (limit !== null && !isRunning) {
+      setTime(limit);
+    }
+  }, [scheduleSettings.useSchedule, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track usage
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
     if (isRunning && prevRemaining.current > remainingSeconds) {
-      const consumed = prevRemaining.current - remainingSeconds;
-      addUsage(consumed);
+      addUsage(prevRemaining.current - remainingSeconds);
     }
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
   // Check SMS thresholds
   useEffect(() => {
-    if (isRunning) {
-      checkSms(remainingSeconds);
-    }
+    if (isRunning) checkSms(remainingSeconds);
   }, [remainingSeconds, isRunning, checkSms]);
 
-  // Also check at zero when finished
   useEffect(() => {
-    if (isFinished) {
-      checkSms(0);
-    }
+    if (isFinished) checkSms(0);
   }, [isFinished, checkSms]);
+
+  // Mark reward if timer finishes (time's up = they used all their time, which is the limit)
+  // We reward staying UNDER limit — so if timer still has time when day ends, that's good
+  // For now, let parent manually mark or auto-mark if not finished by end of session
+  useEffect(() => {
+    if (!isFinished && !isRunning && remainingSeconds > 0 && progress < 1) {
+      // They stopped early — reward them
+    }
+  }, [isFinished, isRunning, remainingSeconds, progress]);
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setNotifEnabled(granted);
+  };
+
+  const handleSettingsToggle = () => {
+    if (pinRequired && !showSettings) return; // Can't open settings when locked
+    setShowSettings(!showSettings);
   };
 
   return (
@@ -72,35 +94,37 @@ const Index = () => {
           <h1 className="text-xl font-bold text-foreground">ScreenTime</h1>
         </div>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/stats")}
-            className="text-muted-foreground"
-          >
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
             <BarChart3 className="w-5 h-5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSettings(!showSettings)}
-            className="text-muted-foreground"
-          >
+          <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground">
             <Settings className="w-5 h-5" />
           </Button>
         </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-8">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
+        {/* Rewards */}
+        <RewardsBadge rewards={rewards} />
+
+        {/* Active Profile */}
+        {profiles.length > 0 && (
+          <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-1.5">
+            <span className="text-lg">{profiles.find(p => p.id === activeId)?.avatar ?? "👤"}</span>
+            <span className="text-sm font-semibold text-foreground">
+              {profiles.find(p => p.id === activeId)?.name ?? "Default"}
+            </span>
+          </div>
+        )}
+
         {/* Mode Toggle */}
         <div className="flex bg-secondary rounded-full p-1 gap-1">
           <button
             onClick={() => changeMode("daily")}
             className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-              mode === "daily"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
+              mode === "daily" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             Daily
@@ -108,9 +132,7 @@ const Index = () => {
           <button
             onClick={() => changeMode("weekly")}
             className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-              mode === "weekly"
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground"
+              mode === "weekly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             Weekly
@@ -118,25 +140,35 @@ const Index = () => {
         </div>
 
         {/* Timer */}
-        <TimerDisplay
-          remainingSeconds={remainingSeconds}
-          progress={progress}
-          isRunning={isRunning}
-          isFinished={isFinished}
-        />
+        <TimerDisplay remainingSeconds={remainingSeconds} progress={progress} isRunning={isRunning} isFinished={isFinished} />
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
-          <Button variant="secondary" size="icon" onClick={() => { reset(); resetSent(); }} className="rounded-full h-12 w-12">
+          <Button
+            variant="secondary" size="icon"
+            onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
+            className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
+            disabled={pinRequired}
+          >
             <RotateCcw className="w-5 h-5" />
           </Button>
 
           {isFinished ? (
-            <Button variant="danger" size="lg" onClick={() => { reset(); resetSent(); }} className="h-16 w-16 rounded-full p-0">
+            <Button
+              variant="danger" size="lg"
+              onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
+              className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+              disabled={pinRequired}
+            >
               <RotateCcw className="w-6 h-6" />
             </Button>
           ) : isRunning ? (
-            <Button variant="danger" size="lg" onClick={pause} className="h-16 w-16 rounded-full p-0">
+            <Button
+              variant="danger" size="lg"
+              onClick={() => { if (!pinRequired) { pause(); markTodayUnderLimit(); } }}
+              className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+              disabled={pinRequired}
+            >
               <Pause className="w-6 h-6" />
             </Button>
           ) : (
@@ -157,11 +189,40 @@ const Index = () => {
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6">
-            <div>
+          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6 animate-in fade-in slide-in-from-top-2">
+            {/* PIN Lock */}
+            <PinLock
+              hasPin={hasPin()}
+              isUnlocked={isUnlocked}
+              onVerify={verifyPin}
+              onSetPin={setPin}
+              onRemovePin={removePin}
+              onLock={lock}
+            />
+
+            <div className="border-t border-border pt-5">
+              <ProfileSelector
+                profiles={profiles}
+                activeId={activeId}
+                onSwitch={switchProfile}
+                onAdd={addProfile}
+                onRemove={removeProfile}
+              />
+            </div>
+
+            <div className="border-t border-border pt-5">
               <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
               <TimeSetter onSetTime={setTime} isRunning={isRunning} />
             </div>
+
+            <div className="border-t border-border pt-5">
+              <ScheduleSettingsUI
+                settings={scheduleSettings}
+                onUpdate={updateSchedule}
+                onUpdateDay={updateDay}
+              />
+            </div>
+
             <div className="border-t border-border pt-5">
               <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
             </div>
