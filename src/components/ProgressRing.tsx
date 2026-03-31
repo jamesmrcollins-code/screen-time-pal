@@ -26,6 +26,8 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
     return "hsl(var(--timer-active))";
   };
 
+  const shouldPulse = isRunning && progress < 0.15 && !isFinished;
+
   return (
     <svg width={size} height={size} className="transform -rotate-90">
       {/* Track */}
@@ -38,6 +40,20 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
         strokeWidth={strokeWidth}
         strokeLinecap="round"
       />
+      {/* Warning background glow */}
+      {isRunning && progress < 0.35 && (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius - strokeWidth}
+          fill={progress < 0.15 ? "hsl(var(--timer-danger) / 0.08)" : "hsl(var(--timer-warning) / 0.06)"}
+          className="transition-all duration-1000"
+        >
+          {shouldPulse && (
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
+          )}
+        </circle>
+      )}
       {/* Progress */}
       <circle
         cx={size / 2}
@@ -51,9 +67,13 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
         strokeDashoffset={offset}
         className="transition-all duration-1000 ease-linear"
         style={{
-          filter: isRunning ? `drop-shadow(0 0 8px ${getStrokeColor()})` : "none",
+          filter: isRunning ? `drop-shadow(0 0 ${progress < 0.15 ? 12 : 8}px ${getStrokeColor()})` : "none",
         }}
-      />
+      >
+        {shouldPulse && (
+          <animate attributeName="stroke-width" values={`${strokeWidth};${strokeWidth + 4};${strokeWidth}`} dur="1.5s" repeatCount="indefinite" />
+        )}
+      </circle>
     </svg>
   );
 };
