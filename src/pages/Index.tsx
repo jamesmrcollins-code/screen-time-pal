@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimeSetter } from "@/components/TimeSetter";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
+import { useNotificationSettings } from "@/hooks/useNotificationSettings";
+import { useSmsNotifier } from "@/hooks/useSmsNotifier";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
 
@@ -23,6 +26,8 @@ const Index = () => {
   } = useScreenTimer();
 
   const { addUsage } = useUsageLog();
+  const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
+  const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
@@ -38,6 +43,20 @@ const Index = () => {
     }
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
+
+  // Check SMS thresholds
+  useEffect(() => {
+    if (isRunning) {
+      checkSms(remainingSeconds);
+    }
+  }, [remainingSeconds, isRunning, checkSms]);
+
+  // Also check at zero when finished
+  useEffect(() => {
+    if (isFinished) {
+      checkSms(0);
+    }
+  }, [isFinished, checkSms]);
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
@@ -108,12 +127,12 @@ const Index = () => {
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
-          <Button variant="secondary" size="icon" onClick={reset} className="rounded-full h-12 w-12">
+          <Button variant="secondary" size="icon" onClick={() => { reset(); resetSent(); }} className="rounded-full h-12 w-12">
             <RotateCcw className="w-5 h-5" />
           </Button>
 
           {isFinished ? (
-            <Button variant="danger" size="lg" onClick={reset} className="h-16 w-16 rounded-full p-0">
+            <Button variant="danger" size="lg" onClick={() => { reset(); resetSent(); }} className="h-16 w-16 rounded-full p-0">
               <RotateCcw className="w-6 h-6" />
             </Button>
           ) : isRunning ? (
@@ -138,9 +157,14 @@ const Index = () => {
 
         {/* Settings Panel */}
         {showSettings && (
-          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border">
-            <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
-            <TimeSetter onSetTime={setTime} isRunning={isRunning} />
+          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6">
+            <div>
+              <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
+              <TimeSetter onSetTime={setTime} isRunning={isRunning} />
+            </div>
+            <div className="border-t border-border pt-5">
+              <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
+            </div>
           </div>
         )}
 
