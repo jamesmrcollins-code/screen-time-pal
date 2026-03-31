@@ -47,6 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        timer: {
+          active: "hsl(var(--timer-active))",
+          warning: "hsl(var(--timer-warning))",
+          danger: "hsl(var(--timer-danger))",
+          track: "hsl(var(--timer-track))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
