@@ -56,7 +56,7 @@ const Stats = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <Timer className="w-6 h-6 text-primary" />
-          <h1 className="text-xl font-bold text-foreground">Usage Stats</h1>
+          <h1 className="text-xl font-extrabold text-foreground font-display">Usage Stats</h1>
         </div>
         <ThemeToggle />
       </header>

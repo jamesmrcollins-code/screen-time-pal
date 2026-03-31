@@ -40,7 +40,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
             {minutes}
           </span>
           <span className="text-2xl font-bold text-muted-foreground">:</span>
-          <span className="text-5xl font-extrabold tabular-nums text-foreground tracking-tight">
+          <span className="text-5xl font-extrabold tabular-nums text-foreground tracking-tight font-display">
             {seconds}
           </span>
         </div>
