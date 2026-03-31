@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimeSetter } from "@/components/TimeSetter";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
+import { useNotificationSettings } from "@/hooks/useNotificationSettings";
+import { useSmsNotifier } from "@/hooks/useSmsNotifier";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3 } from "lucide-react";
 
