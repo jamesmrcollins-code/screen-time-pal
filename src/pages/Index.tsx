@@ -74,14 +74,21 @@ const Index = () => {
     if (isFinished) checkSms(0);
   }, [isFinished, checkSms]);
 
-  // Mark reward if timer finishes (time's up = they used all their time, which is the limit)
-  // We reward staying UNDER limit — so if timer still has time when day ends, that's good
-  // For now, let parent manually mark or auto-mark if not finished by end of session
+  // Lock screen & alarm on finish
+  const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
-    if (!isFinished && !isRunning && remainingSeconds > 0 && progress < 1) {
-      // They stopped early — reward them
+    if (isFinished && !lockAlarmTriggeredRef.current) {
+      lockAlarmTriggeredRef.current = true;
+      if (lockSettings.lockOnZero && hasPin()) setIsScreenLocked(true);
+      if (lockSettings.alarmOnZero) startAlarm();
     }
-  }, [isFinished, isRunning, remainingSeconds, progress]);
+    if (!isFinished) lockAlarmTriggeredRef.current = false;
+  }, [isFinished, lockSettings, hasPin, startAlarm]);
+
+  const handleLockScreenUnlock = () => {
+    setIsScreenLocked(false);
+    stopAlarm();
+  };
 
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
