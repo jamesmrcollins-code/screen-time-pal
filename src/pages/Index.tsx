@@ -26,6 +26,8 @@ const Index = () => {
   } = useScreenTimer();
 
   const { addUsage } = useUsageLog();
+  const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
+  const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
