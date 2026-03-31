@@ -32,7 +32,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
       <ProgressRing progress={progress} isRunning={isRunning} isFinished={isFinished} />
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-extrabold tabular-nums text-foreground tracking-tight">
+          <span className="text-5xl font-extrabold tabular-nums text-foreground tracking-tight font-display">
             {hours}
           </span>
           <span className="text-2xl font-bold text-muted-foreground">:</span>
