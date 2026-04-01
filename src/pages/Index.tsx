@@ -34,11 +34,11 @@ const Index = () => {
     start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
-  const { log: usageLogData, addUsage, setLogBulk } = useUsageLog();
+  const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
+  const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
-  const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
   const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();

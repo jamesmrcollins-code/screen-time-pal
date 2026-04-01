@@ -8,6 +8,7 @@ import {
 export interface UsageEntry {
   date: string; // ISO date string YYYY-MM-DD
   secondsUsed: number;
+  profileId?: string | null;
 }
 
 const USAGE_KEY = "screen-timer-usage-log";
@@ -29,25 +30,32 @@ function getTodayKey(): string {
   return format(new Date(), "yyyy-MM-dd");
 }
 
-export function useUsageLog() {
+export function useUsageLog(profileId?: string | null) {
   const [log, setLog] = useState<UsageEntry[]>(loadLog);
 
   useEffect(() => {
     saveLog(log);
   }, [log]);
 
+  // Filter log entries for the active profile
+  const profileLog = log.filter((e) => (e.profileId ?? null) === (profileId ?? null));
+
   const addUsage = useCallback((seconds: number) => {
     setLog((prev) => {
       const today = getTodayKey();
-      const existing = prev.find((e) => e.date === today);
+      const existing = prev.find(
+        (e) => e.date === today && (e.profileId ?? null) === (profileId ?? null)
+      );
       if (existing) {
         return prev.map((e) =>
-          e.date === today ? { ...e, secondsUsed: e.secondsUsed + seconds } : e
+          e.date === today && (e.profileId ?? null) === (profileId ?? null)
+            ? { ...e, secondsUsed: e.secondsUsed + seconds }
+            : e
         );
       }
-      return [...prev, { date: today, secondsUsed: seconds }];
+      return [...prev, { date: today, secondsUsed: seconds, profileId: profileId ?? null }];
     });
-  }, []);
+  }, [profileId]);
 
   const getTotal = useCallback(
     (period: "day" | "week" | "month" | "year") => {
@@ -71,14 +79,14 @@ export function useUsageLog() {
           end = endOfYear(now);
           break;
       }
-      return log
+      return profileLog
         .filter((e) => {
           const d = new Date(e.date + "T12:00:00");
           return isWithinInterval(d, { start, end });
         })
         .reduce((sum, e) => sum + e.secondsUsed, 0);
     },
-    [log]
+    [profileLog]
   );
 
   const getDailyData = useCallback(
@@ -90,7 +98,7 @@ export function useUsageLog() {
       });
       return interval.map((d) => {
         const key = format(d, "yyyy-MM-dd");
-        const entry = log.find((e) => e.date === key);
+        const entry = profileLog.find((e) => e.date === key);
         return {
           date: format(d, "EEE"),
           fullDate: key,
@@ -99,12 +107,12 @@ export function useUsageLog() {
         };
       });
     },
-    [log]
+    [profileLog]
   );
 
   const setLogBulk = useCallback((entries: UsageEntry[]) => {
     setLog(entries);
   }, []);
 
-  return { log, addUsage, getTotal, getDailyData, setLogBulk };
+  return { log, profileLog, addUsage, getTotal, getDailyData, setLogBulk };
 }

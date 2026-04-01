@@ -41,13 +41,17 @@ export function useCloudSync(
         // Load usage logs
         const { data: cloudUsage } = await supabase
           .from("usage_logs")
-          .select("date, seconds_used")
+          .select("date, seconds_used, profile_id")
           .eq("user_id", user.id);
 
         if (cloudUsage && cloudUsage.length > 0) {
           const merged = mergeUsage(
             usageLog,
-            cloudUsage.map((r) => ({ date: r.date, secondsUsed: r.seconds_used }))
+            cloudUsage.map((r) => ({
+              date: r.date,
+              secondsUsed: r.seconds_used,
+              profileId: r.profile_id ?? null,
+            }))
           );
           addUsageBulk(merged);
         }
@@ -60,7 +64,6 @@ export function useCloudSync(
           .maybeSingle();
 
         if (cloudRewards) {
-          // Merge dates_under_limit
           const localDates = new Set(rewardsData.datesUnderLimit);
           const cloudDates: string[] = cloudRewards.dates_under_limit ?? [];
           cloudDates.forEach((d) => localDates.add(d));
@@ -69,7 +72,6 @@ export function useCloudSync(
             lastCheckedDate: cloudRewards.last_checked_date || rewardsData.lastCheckedDate,
           });
 
-          // Theme data
           setThemeFromCloud({
             unlockedIds: cloudRewards.unlocked_themes ?? ["default"],
             activeThemeId: cloudRewards.active_theme_id ?? "default",
@@ -106,8 +108,9 @@ export function useCloudSync(
           user_id: user.id,
           date: entry.date,
           seconds_used: entry.secondsUsed,
+          profile_id: entry.profileId ?? null,
         },
-        { onConflict: "user_id,date" }
+        { onConflict: "user_id,date,profile_id" }
       );
     }
   }, [user, usageLog]);
@@ -164,8 +167,17 @@ export function useCloudSync(
 }
 
 function mergeUsage(local: UsageEntry[], cloud: UsageEntry[]): UsageEntry[] {
-  const map = new Map<string, number>();
-  local.forEach((e) => map.set(e.date, Math.max(map.get(e.date) ?? 0, e.secondsUsed)));
-  cloud.forEach((e) => map.set(e.date, Math.max(map.get(e.date) ?? 0, e.secondsUsed)));
-  return Array.from(map.entries()).map(([date, secondsUsed]) => ({ date, secondsUsed }));
+  const key = (e: UsageEntry) => `${e.date}|${e.profileId ?? ""}`;
+  const map = new Map<string, UsageEntry>();
+  for (const e of local) {
+    const k = key(e);
+    const existing = map.get(k);
+    if (!existing || e.secondsUsed > existing.secondsUsed) map.set(k, e);
+  }
+  for (const e of cloud) {
+    const k = key(e);
+    const existing = map.get(k);
+    if (!existing || e.secondsUsed > existing.secondsUsed) map.set(k, e);
+  }
+  return Array.from(map.values());
 }

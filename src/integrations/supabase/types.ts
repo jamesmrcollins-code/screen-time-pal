@@ -106,6 +106,7 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          profile_id: string | null
           seconds_used: number
           updated_at: string
           user_id: string
@@ -114,6 +115,7 @@ export type Database = {
           created_at?: string
           date: string
           id?: string
+          profile_id?: string | null
           seconds_used?: number
           updated_at?: string
           user_id: string
@@ -122,6 +124,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          profile_id?: string | null
           seconds_used?: number
           updated_at?: string
           user_id?: string
