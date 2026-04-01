@@ -41,8 +41,10 @@ const Index = () => {
   const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
+  const { activeThemeId, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes } = useAppTheme(rewards.totalStars);
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
