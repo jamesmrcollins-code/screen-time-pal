@@ -108,6 +108,7 @@ const Index = () => {
 
   return (
     <>
+      <OnboardingDialog open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       {isScreenLocked && (
         <TimesUpLockScreen
           onUnlock={handleLockScreenUnlock}
