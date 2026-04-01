@@ -171,5 +171,9 @@ export function useRewards(
     todayUnderLimit,
   };
 
-  return { rewards };
+  const setFromCloud = useCallback((cloudData: { datesUnderLimit: string[]; lastCheckedDate: string }) => {
+    setData({ datesUnderLimit: cloudData.datesUnderLimit, lastCheckedDate: cloudData.lastCheckedDate });
+  }, []);
+
+  return { rewards, rewardsRaw: data, setRewardsFromCloud: setFromCloud };
 }
