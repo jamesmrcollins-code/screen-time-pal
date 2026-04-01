@@ -25,7 +25,8 @@ import { useAlarm } from "@/hooks/useAlarm";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
+import { ReferFriend } from "@/components/ReferFriend";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
@@ -55,6 +56,7 @@ const Index = () => {
   );
   const [showSettings, setShowSettings] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [showReferFriend, setShowReferFriend] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
@@ -134,6 +136,9 @@ const Index = () => {
           <h1 className="text-lg font-extrabold text-foreground font-display whitespace-nowrap">ScreenTime Pal</h1>
         </div>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground">
+            <Share2 className="w-5 h-5" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground">
             <Palette className="w-5 h-5" />
           </Button>
@@ -159,6 +164,8 @@ const Index = () => {
         unlockTheme={unlockTheme}
         setActiveTheme={setActiveTheme}
       />
+
+      <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
