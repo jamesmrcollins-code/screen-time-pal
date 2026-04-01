@@ -34,17 +34,25 @@ const Index = () => {
     start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
-  const { log: usageLogData, addUsage } = useUsageLog();
+  const { log: usageLogData, addUsage, setLogBulk } = useUsageLog();
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
-  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
-  const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
+  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
+  const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
-  const { activeThemeId, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes } = useAppTheme(rewards.totalStars);
+  const { activeThemeId, unlockedIds, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes, setThemeFromCloud } = useAppTheme(rewards.totalStars);
   const navigate = useNavigate();
+
+  // Cloud sync
+  useCloudSync(
+    usageLogData, setLogBulk,
+    rewardsRaw, setRewardsFromCloud,
+    { unlockedIds, activeThemeId }, setThemeFromCloud,
+    scheduleSettings, setScheduleFromCloud
+  );
   const [showSettings, setShowSettings] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
