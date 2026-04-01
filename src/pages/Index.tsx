@@ -183,7 +183,7 @@ const Index = () => {
           {isFinished ? (
             <Button
               variant="danger" size="lg"
-              onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
+              onClick={() => { if (!pinRequired) { if (remainingSeconds > 0) markTodayUnderLimit(); reset(); resetSent(); } }}
               className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
               disabled={pinRequired}
             >
