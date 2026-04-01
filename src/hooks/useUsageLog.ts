@@ -102,5 +102,9 @@ export function useUsageLog() {
     [log]
   );
 
-  return { log, addUsage, getTotal, getDailyData };
+  const setLogBulk = useCallback((entries: UsageEntry[]) => {
+    setLog(entries);
+  }, []);
+
+  return { log, addUsage, getTotal, getDailyData, setLogBulk };
 }
