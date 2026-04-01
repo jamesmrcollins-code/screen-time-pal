@@ -11,6 +11,7 @@ import { LockScreenSettings } from "@/components/LockScreenSettings";
 import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemePicker } from "@/components/ThemePicker";
+import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingDialog";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
