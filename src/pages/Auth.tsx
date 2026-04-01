@@ -64,7 +64,7 @@ const Auth = () => {
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Timer className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-extrabold text-foreground font-display">ScreenTime</h1>
+            <h1 className="text-3xl font-extrabold text-foreground font-display">ScreenTime Pal</h1>
           </div>
           <p className="text-muted-foreground text-sm">
             {mode === "signup" ? "Create your account" : mode === "forgot" ? "Reset your password" : "Welcome back"}
