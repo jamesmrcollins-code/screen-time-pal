@@ -30,13 +30,13 @@ const Index = () => {
     start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
-  const { addUsage } = useUsageLog();
+  const { log: usageLogData, addUsage } = useUsageLog();
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
-  const { rewards, markTodayUnderLimit } = useRewards(activeId);
   const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
+  const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
   const navigate = useNavigate();
@@ -183,7 +183,7 @@ const Index = () => {
           {isFinished ? (
             <Button
               variant="danger" size="lg"
-              onClick={() => { if (!pinRequired) { if (remainingSeconds > 0) markTodayUnderLimit(); reset(); resetSent(); } }}
+              onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
               className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
               disabled={pinRequired}
             >
