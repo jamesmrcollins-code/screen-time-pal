@@ -122,6 +122,9 @@ const Index = () => {
           <h1 className="text-xl font-extrabold text-foreground font-display">ScreenTime Pal</h1>
         </div>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground">
+            <Palette className="w-5 h-5" />
+          </Button>
           <ThemeToggle />
           <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
             <BarChart3 className="w-5 h-5" />
@@ -134,6 +137,16 @@ const Index = () => {
           </Button>
         </div>
       </header>
+
+      <ThemePicker
+        open={showThemePicker}
+        onOpenChange={setShowThemePicker}
+        totalStars={rewards.totalStars}
+        activeThemeId={activeThemeId}
+        isUnlocked={isThemeUnlocked}
+        unlockTheme={unlockTheme}
+        setActiveTheme={setActiveTheme}
+      />
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
