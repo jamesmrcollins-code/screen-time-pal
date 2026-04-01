@@ -35,8 +35,9 @@ const Index = () => {
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
-  const { rewards, markTodayUnderLimit } = useRewards(activeId);
   const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
+  const { log: usageLogData } = useUsageLog();
+  const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
   const navigate = useNavigate();
