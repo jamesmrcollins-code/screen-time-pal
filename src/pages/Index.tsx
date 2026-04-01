@@ -136,6 +136,9 @@ const Index = () => {
           <h1 className="text-lg font-extrabold text-foreground font-display whitespace-nowrap">ScreenTime Pal</h1>
         </div>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground">
+            <Share2 className="w-5 h-5" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground">
             <Palette className="w-5 h-5" />
           </Button>
