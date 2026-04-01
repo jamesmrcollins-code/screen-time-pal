@@ -23,6 +23,7 @@ import { useSchedule } from "@/hooks/useSchedule";
 import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
 import { useAlarm } from "@/hooks/useAlarm";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
