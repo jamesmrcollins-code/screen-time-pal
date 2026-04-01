@@ -10,6 +10,7 @@ import { ScheduleSettings as ScheduleSettingsUI } from "@/components/ScheduleSet
 import { LockScreenSettings } from "@/components/LockScreenSettings";
 import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemePicker } from "@/components/ThemePicker";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
