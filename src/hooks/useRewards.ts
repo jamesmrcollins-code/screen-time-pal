@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { format, subDays } from "date-fns";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 import type { ScheduleSettings } from "@/hooks/useSchedule";
