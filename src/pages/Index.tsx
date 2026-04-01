@@ -10,6 +10,7 @@ import { ScheduleSettings as ScheduleSettingsUI } from "@/components/ScheduleSet
 import { LockScreenSettings } from "@/components/LockScreenSettings";
 import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemePicker } from "@/components/ThemePicker";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
@@ -20,8 +21,9 @@ import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
 import { useAlarm } from "@/hooks/useAlarm";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
@@ -39,8 +41,10 @@ const Index = () => {
   const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
+  const { activeThemeId, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes } = useAppTheme(rewards.totalStars);
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
@@ -118,6 +122,9 @@ const Index = () => {
           <h1 className="text-xl font-extrabold text-foreground font-display">ScreenTime Pal</h1>
         </div>
         <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground">
+            <Palette className="w-5 h-5" />
+          </Button>
           <ThemeToggle />
           <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
             <BarChart3 className="w-5 h-5" />
@@ -130,6 +137,16 @@ const Index = () => {
           </Button>
         </div>
       </header>
+
+      <ThemePicker
+        open={showThemePicker}
+        onOpenChange={setShowThemePicker}
+        totalStars={rewards.totalStars}
+        activeThemeId={activeThemeId}
+        isUnlocked={isThemeUnlocked}
+        unlockTheme={unlockTheme}
+        setActiveTheme={setActiveTheme}
+      />
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
