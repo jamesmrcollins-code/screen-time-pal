@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
+import { useProfiles } from "@/hooks/useProfiles";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line } from "recharts";
 import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,9 +33,11 @@ const StatCard = ({
 );
 
 const Stats = () => {
-  const { log: usageLogData, getTotal, getDailyData } = useUsageLog();
+  const { profiles, activeId } = useProfiles();
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(activeId);
+  const { log: usageLogData, getTotal, getDailyData } = useUsageLog(selectedProfileId);
   const { settings: scheduleSettings } = useSchedule();
-  const { rewards } = useRewards(null, usageLogData, scheduleSettings);
+  const { rewards } = useRewards(selectedProfileId, usageLogData, scheduleSettings);
   const navigate = useNavigate();
   const chartData = getDailyData(7);
   const monthData = getDailyData(30);
@@ -50,6 +54,8 @@ const Stats = () => {
     { key: "year" as const, label: "This Year" },
   ];
 
+  const selectedProfile = profiles.find((p) => p.id === selectedProfileId);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center justify-between px-6 py-4">
@@ -64,6 +70,33 @@ const Stats = () => {
       </header>
 
       <main className="flex-1 px-6 pb-8 space-y-6 max-w-lg mx-auto w-full">
+        {/* Profile selector */}
+        {profiles.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {profiles.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedProfileId(p.id)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all shrink-0 ${
+                  selectedProfileId === p.id
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span>{p.avatar}</span>
+                <span>{p.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Currently viewing label */}
+        {selectedProfile && (
+          <p className="text-sm text-muted-foreground text-center">
+            Viewing stats for <span className="font-semibold text-foreground">{selectedProfile.avatar} {selectedProfile.name}</span>
+          </p>
+        )}
+
         {/* Rewards row */}
         <div className="grid grid-cols-3 gap-3">
           <StatCard
