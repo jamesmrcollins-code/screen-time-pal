@@ -30,7 +30,7 @@ const Index = () => {
     start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
-  const { addUsage } = useUsageLog();
+  const { log: usageLogData, addUsage } = useUsageLog();
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
