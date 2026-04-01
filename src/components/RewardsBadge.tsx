@@ -24,7 +24,7 @@ const explanations = {
     icon: <Star className="w-6 h-6 text-timer-warning" />,
     title: "Stars",
     description:
-      "You earn 1 star for every 5 days you stay within your screen time limit. Keep building your streak to earn more stars!",
+      "You earn 1 star for every 5 days you stay within your screen time limit. Spend stars in the Theme Store (🎨) to unlock new color themes!",
   },
   best: {
     icon: <Trophy className="w-6 h-6 text-primary" />,
