@@ -21,8 +21,9 @@ import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
 import { useAlarm } from "@/hooks/useAlarm";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
