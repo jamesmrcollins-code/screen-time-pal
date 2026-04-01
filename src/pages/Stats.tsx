@@ -31,8 +31,9 @@ const StatCard = ({
 );
 
 const Stats = () => {
-  const { getTotal, getDailyData } = useUsageLog();
-  const { rewards } = useRewards();
+  const { log: usageLogData, getTotal, getDailyData } = useUsageLog();
+  const { settings: scheduleSettings } = useSchedule();
+  const { rewards } = useRewards(null, usageLogData, scheduleSettings);
   const navigate = useNavigate();
   const chartData = getDailyData(7);
   const monthData = getDailyData(30);
