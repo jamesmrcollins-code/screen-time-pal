@@ -11,6 +11,7 @@ import { LockScreenSettings } from "@/components/LockScreenSettings";
 import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemePicker } from "@/components/ThemePicker";
+import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingDialog";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
@@ -22,6 +23,7 @@ import { useSchedule } from "@/hooks/useSchedule";
 import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
 import { useAlarm } from "@/hooks/useAlarm";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,20 +34,29 @@ const Index = () => {
     start, pause, reset, setTime, changeMode, requestNotificationPermission,
   } = useScreenTimer();
 
-  const { log: usageLogData, addUsage } = useUsageLog();
+  const { log: usageLogData, addUsage, setLogBulk } = useUsageLog();
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
-  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit } = useSchedule(activeId);
-  const { rewards } = useRewards(activeId, usageLogData, scheduleSettings);
+  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
+  const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
-  const { activeThemeId, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes } = useAppTheme(rewards.totalStars);
+  const { activeThemeId, unlockedIds, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes, setThemeFromCloud } = useAppTheme(rewards.totalStars);
   const navigate = useNavigate();
+
+  // Cloud sync
+  useCloudSync(
+    usageLogData, setLogBulk,
+    rewardsRaw, setRewardsFromCloud,
+    { unlockedIds, activeThemeId }, setThemeFromCloud,
+    scheduleSettings, setScheduleFromCloud
+  );
   const [showSettings, setShowSettings] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
@@ -106,6 +117,7 @@ const Index = () => {
 
   return (
     <>
+      <OnboardingDialog open={showOnboarding} onClose={() => setShowOnboarding(false)} />
       {isScreenLocked && (
         <TimesUpLockScreen
           onUnlock={handleLockScreenUnlock}

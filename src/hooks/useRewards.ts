@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { format, subDays } from "date-fns";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 import type { ScheduleSettings } from "@/hooks/useSchedule";
@@ -171,5 +171,9 @@ export function useRewards(
     todayUnderLimit,
   };
 
-  return { rewards };
+  const setFromCloud = useCallback((cloudData: { datesUnderLimit: string[]; lastCheckedDate: string }) => {
+    setData({ datesUnderLimit: cloudData.datesUnderLimit, lastCheckedDate: cloudData.lastCheckedDate });
+  }, []);
+
+  return { rewards, rewardsRaw: data, setRewardsFromCloud: setFromCloud };
 }

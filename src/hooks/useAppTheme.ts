@@ -210,6 +210,10 @@ export function useAppTheme(totalStars: number) {
     [store.unlockedIds]
   );
 
+  const setFromCloud = useCallback((cloudData: { unlockedIds: string[]; activeThemeId: string }) => {
+    setStore({ activeThemeId: cloudData.activeThemeId, unlockedIds: cloudData.unlockedIds });
+  }, []);
+
   return {
     activeThemeId: store.activeThemeId,
     unlockedIds: store.unlockedIds,
@@ -217,5 +221,6 @@ export function useAppTheme(totalStars: number) {
     setActiveTheme,
     isUnlocked,
     themes: APP_THEMES,
+    setThemeFromCloud: setFromCloud,
   };
 }

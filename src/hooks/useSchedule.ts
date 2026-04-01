@@ -69,7 +69,11 @@ export function useSchedule(profileId: string | null = null) {
     return daySettings.limitSeconds;
   }, [settings]);
 
-  return { settings, update, updateDay, getTodayLimit, DAY_NAMES, DAY_LABELS };
+  const setFromCloud = useCallback((cloudData: { useSchedule: boolean; days: Record<string, any> }) => {
+    setSettings({ useSchedule: cloudData.useSchedule, days: cloudData.days as ScheduleSettings["days"] });
+  }, []);
+
+  return { settings, update, updateDay, getTodayLimit, DAY_NAMES, DAY_LABELS, setScheduleFromCloud: setFromCloud };
 }
 
 export { DAY_NAMES, DAY_LABELS };
