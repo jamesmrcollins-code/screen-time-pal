@@ -1,5 +1,6 @@
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useRewards } from "@/hooks/useRewards";
+import { useSchedule } from "@/hooks/useSchedule";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line } from "recharts";
 import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
