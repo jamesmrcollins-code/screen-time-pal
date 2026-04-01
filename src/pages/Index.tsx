@@ -165,6 +165,8 @@ const Index = () => {
         setActiveTheme={setActiveTheme}
       />
 
+      <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
+
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
         {/* Rewards */}
