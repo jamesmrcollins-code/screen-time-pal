@@ -25,7 +25,8 @@ import { useAlarm } from "@/hooks/useAlarm";
 import { useAppTheme } from "@/hooks/useAppTheme";
 import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
-import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette } from "lucide-react";
+import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
+import { ReferFriend } from "@/components/ReferFriend";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
