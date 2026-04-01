@@ -41,6 +41,93 @@ export type Database = {
         }
         Relationships: []
       }
+      rewards: {
+        Row: {
+          active_theme_id: string
+          created_at: string
+          dates_under_limit: string[]
+          id: string
+          last_checked_date: string
+          unlocked_themes: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_theme_id?: string
+          created_at?: string
+          dates_under_limit?: string[]
+          id?: string
+          last_checked_date?: string
+          unlocked_themes?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_theme_id?: string
+          created_at?: string
+          dates_under_limit?: string[]
+          id?: string
+          last_checked_date?: string
+          unlocked_themes?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      schedule_settings: {
+        Row: {
+          created_at: string
+          days: Json
+          id: string
+          updated_at: string
+          use_schedule: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days?: Json
+          id?: string
+          updated_at?: string
+          use_schedule?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days?: Json
+          id?: string
+          updated_at?: string
+          use_schedule?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usage_logs: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          seconds_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          seconds_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          seconds_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
