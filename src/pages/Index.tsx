@@ -263,20 +263,23 @@ const Index = () => {
           />
 
           <div className="flex gap-4 items-center">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                if (!pinRequired) {
-                  reset();
-                  resetSent();
-                }
-              }}
-              className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
-              disabled={pinRequired}
-            >
-              <RotateCcw className="w-5 h-5" />
-            </Button>
+            <div className="flex flex-col items-center gap-1">
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={() => {
+                  if (!pinRequired) {
+                    reset();
+                    resetSent();
+                  }
+                }}
+                className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
+                disabled={pinRequired}
+              >
+                <RotateCcw className="w-5 h-5" />
+              </Button>
+              <span className="text-[10px] text-muted-foreground font-medium">Reset</span>
+            </div>
 
             {isFinished ? (
               <Button
@@ -313,14 +316,19 @@ const Index = () => {
               </Button>
             )}
 
-            <Button
-              variant={notifEnabled ? "secondary" : "outline"}
-              size="icon"
-              onClick={handleEnableNotifications}
-              className="rounded-full h-12 w-12"
-            >
-              <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
-            </Button>
+            <div className="flex flex-col items-center gap-1">
+              <Button
+                variant={notifEnabled ? "secondary" : "outline"}
+                size="icon"
+                onClick={handleEnableNotifications}
+                className="rounded-full h-12 w-12"
+              >
+                <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
+              </Button>
+              <span className="text-[10px] text-muted-foreground font-medium">
+                {notifEnabled ? "Alerts on" : "Alerts"}
+              </span>
+            </div>
           </div>
 
           {showSettings && (
