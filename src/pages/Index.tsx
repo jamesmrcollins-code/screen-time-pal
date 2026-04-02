@@ -62,6 +62,7 @@ const Index = () => {
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showReferFriend, setShowReferFriend] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
+  const [focusedProfileId, setFocusedProfileId] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
