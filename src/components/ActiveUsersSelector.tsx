@@ -7,6 +7,8 @@ interface Props {
   activeIds: string[];
   onToggle: (id: string) => void;
   profileTimerInfos: ProfileTimerInfo[];
+  focusedId: string | null;
+  onFocus: (id: string) => void;
 }
 
 function formatHM(seconds: number): string {
@@ -22,6 +24,8 @@ export const ActiveUsersSelector: React.FC<Props> = ({
   activeIds,
   onToggle,
   profileTimerInfos,
+  focusedId,
+  onFocus,
 }) => {
   if (profiles.length === 0) return null;
 
@@ -31,13 +35,25 @@ export const ActiveUsersSelector: React.FC<Props> = ({
       <div className="flex gap-2 flex-wrap justify-center">
         {profiles.map((p) => {
           const isActive = activeIds.includes(p.id);
+          const isFocused = focusedId === p.id;
           const info = profileTimerInfos.find((i) => i.profileId === p.id);
           return (
             <button
               key={p.id}
-              onClick={() => onToggle(p.id)}
+              onClick={() => {
+                if (isActive) {
+                  onFocus(p.id);
+                } else {
+                  onToggle(p.id);
+                }
+              }}
+              onDoubleClick={() => {
+                if (isActive) onToggle(p.id);
+              }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all border ${
-                isActive
+                isFocused
+                  ? "bg-primary/20 border-primary/60 text-primary shadow-md ring-2 ring-primary/30"
+                  : isActive
                   ? "bg-primary/10 border-primary/40 text-primary shadow-sm"
                   : "bg-secondary border-border text-muted-foreground"
               }`}
@@ -53,6 +69,9 @@ export const ActiveUsersSelector: React.FC<Props> = ({
           );
         })}
       </div>
+      {activeIds.length > 1 && (
+        <p className="text-[10px] text-muted-foreground text-center">Tap to view timer · Double-tap to deactivate</p>
+      )}
     </div>
   );
 };
