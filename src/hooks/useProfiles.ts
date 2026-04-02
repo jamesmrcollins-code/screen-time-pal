@@ -7,7 +7,7 @@ export interface ChildProfile {
 }
 
 const PROFILES_KEY = "screen-timer-profiles";
-const ACTIVE_KEY = "screen-timer-active-profile";
+const ACTIVE_IDS_KEY = "screen-timer-active-profiles";
 
 const DEFAULT_AVATARS = ["👧", "👦", "🧒", "👶", "🐱", "🐶", "🦊", "🐻"];
 
@@ -24,13 +24,25 @@ function saveProfiles(profiles: ChildProfile[]) {
   localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
 }
 
+function loadActiveIds(): string[] {
+  try {
+    const raw = localStorage.getItem(ACTIVE_IDS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveActiveIds(ids: string[]) {
+  localStorage.setItem(ACTIVE_IDS_KEY, JSON.stringify(ids));
+}
+
 export function useProfiles() {
   const [profiles, setProfiles] = useState<ChildProfile[]>(loadProfiles);
-  const [activeId, setActiveId] = useState<string | null>(
-    () => localStorage.getItem(ACTIVE_KEY)
-  );
+  const [activeIds, setActiveIds] = useState<string[]>(loadActiveIds);
 
-  const activeProfile = profiles.find((p) => p.id === activeId) ?? null;
+  // For backward compat, expose a single activeId (first active or null)
+  const activeId = activeIds.length > 0 ? activeIds[0] : null;
 
   const addProfile = useCallback((name: string) => {
     const newProfile: ChildProfile = {
@@ -43,8 +55,12 @@ export function useProfiles() {
       saveProfiles(next);
       return next;
     });
-    setActiveId(newProfile.id);
-    localStorage.setItem(ACTIVE_KEY, newProfile.id);
+    // Auto-activate new profile
+    setActiveIds((prev) => {
+      const next = [...prev, newProfile.id];
+      saveActiveIds(next);
+      return next;
+    });
     return newProfile;
   }, []);
 
@@ -54,17 +70,30 @@ export function useProfiles() {
       saveProfiles(next);
       return next;
     });
-    if (activeId === id) {
-      setActiveId(null);
-      localStorage.removeItem(ACTIVE_KEY);
-    }
-  }, [activeId]);
-
-  const switchProfile = useCallback((id: string | null) => {
-    setActiveId(id);
-    if (id) localStorage.setItem(ACTIVE_KEY, id);
-    else localStorage.removeItem(ACTIVE_KEY);
+    setActiveIds((prev) => {
+      const next = prev.filter((aid) => aid !== id);
+      saveActiveIds(next);
+      return next;
+    });
   }, []);
 
-  return { profiles, activeProfile, activeId, addProfile, removeProfile, switchProfile, DEFAULT_AVATARS };
+  const toggleActiveProfile = useCallback((id: string) => {
+    setActiveIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((aid) => aid !== id) : [...prev, id];
+      saveActiveIds(next);
+      return next;
+    });
+  }, []);
+
+  const switchProfile = useCallback((id: string | null) => {
+    if (id) {
+      setActiveIds([id]);
+      saveActiveIds([id]);
+    } else {
+      setActiveIds([]);
+      saveActiveIds([]);
+    }
+  }, []);
+
+  return { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile, DEFAULT_AVATARS };
 }

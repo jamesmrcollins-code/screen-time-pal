@@ -12,6 +12,7 @@ import { TimesUpLockScreen } from "@/components/TimesUpLockScreen";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThemePicker } from "@/components/ThemePicker";
 import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingDialog";
+import { ActiveUsersSelector } from "@/components/ActiveUsersSelector";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
 import { useNotificationSettings } from "@/hooks/useNotificationSettings";
@@ -38,13 +39,13 @@ function formatHM(seconds: number): string {
 }
 
 const Index = () => {
-  const {
-    dailyRemainingSeconds, weeklyRemainingSeconds,
-    remainingSeconds, isRunning, isFinished, activeLimit, progress,
-    start, pause, reset, setDailyTime, setWeeklyTime, requestNotificationPermission,
-  } = useScreenTimer();
+  const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
 
-  const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
+  const {
+    profileTimerInfos, remainingSeconds, isRunning, isFinished, activeLimit, progress,
+    start, pause, reset, setDailyTime, setWeeklyTime, requestNotificationPermission,
+  } = useScreenTimer(activeIds);
+
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
@@ -126,6 +127,11 @@ const Index = () => {
     setShowSettings(!showSettings);
   };
 
+  // Find the profile that's closest to running out
+  const lowestInfo = profileTimerInfos.length > 0
+    ? profileTimerInfos.reduce((min, p) => p.effectiveRemaining < min.effectiveRemaining ? p : min)
+    : null;
+
   return (
     <>
       <OnboardingDialog open={showOnboarding} onClose={() => setShowOnboarding(false)} />
@@ -177,35 +183,35 @@ const Index = () => {
       <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
 
       {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-6">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-5">
         {/* Rewards */}
         <RewardsBadge rewards={rewards} />
 
-        {/* Active Profile */}
-        {profiles.length > 0 && (
-          <div className="flex items-center gap-2 bg-card border border-border rounded-full px-4 py-1.5">
-            <span className="text-lg">{profiles.find(p => p.id === activeId)?.avatar ?? "👤"}</span>
-            <span className="text-sm font-semibold text-foreground">
-              {profiles.find(p => p.id === activeId)?.name ?? "Default"}
-            </span>
+        {/* Active Users Selector */}
+        <ActiveUsersSelector
+          profiles={profiles}
+          activeIds={activeIds}
+          onToggle={toggleActiveProfile}
+          profileTimerInfos={profileTimerInfos}
+        />
+
+        {/* Dual limit indicators for the binding profile */}
+        {lowestInfo && (
+          <div className="flex gap-3 text-sm">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+              lowestInfo.activeLimit === "daily" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
+            }`}>
+              <span>📅 Daily:</span>
+              <span className="tabular-nums font-medium">{formatHM(lowestInfo.dailyRemaining)}</span>
+            </div>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+              lowestInfo.activeLimit === "weekly" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
+            }`}>
+              <span>📆 Weekly:</span>
+              <span className="tabular-nums font-medium">{formatHM(lowestInfo.weeklyRemaining)}</span>
+            </div>
           </div>
         )}
-
-        {/* Dual limit indicators */}
-        <div className="flex gap-3 text-sm">
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-            activeLimit === "daily" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
-          }`}>
-            <span>📅 Daily:</span>
-            <span className="tabular-nums font-medium">{formatHM(dailyRemainingSeconds)}</span>
-          </div>
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-            activeLimit === "weekly" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
-          }`}>
-            <span>📆 Weekly:</span>
-            <span className="tabular-nums font-medium">{formatHM(weeklyRemainingSeconds)}</span>
-          </div>
-        </div>
 
         {/* Timer */}
         <TimerDisplay remainingSeconds={remainingSeconds} progress={progress} isRunning={isRunning} isFinished={isFinished} activeLimit={activeLimit} />
@@ -280,7 +286,7 @@ const Index = () => {
 
             <div className="border-t border-border pt-5">
               <h2 className="text-lg font-bold text-foreground mb-1">📅 Daily Limit</h2>
-              <p className="text-xs text-muted-foreground mb-4">Set today's screen time limit. Resets each day.</p>
+              <p className="text-xs text-muted-foreground mb-4">Set today's screen time limit for all active profiles. Resets each day.</p>
               <TimeSetter onSetTime={setDailyTime} isRunning={isRunning} />
             </div>
 
@@ -316,10 +322,7 @@ const Index = () => {
           <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 max-w-sm w-full text-center">
             <p className="text-accent font-semibold text-lg">⏰ Time's Up!</p>
             <p className="text-muted-foreground text-sm mt-1">
-              {activeLimit === "weekly" || weeklyRemainingSeconds <= 0
-                ? "Your weekly screen time limit has been reached."
-                : "Your daily screen time limit has been reached."}
-              {" "}Reset to start a new session.
+              Screen time limit has been reached. Reset to start a new session.
             </p>
           </div>
         )}
