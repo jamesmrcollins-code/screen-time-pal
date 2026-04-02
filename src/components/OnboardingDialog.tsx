@@ -55,7 +55,7 @@ export const OnboardingDialog: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-xs rounded-2xl" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-xs rounded-2xl [&>button.absolute]:hidden" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader className="items-center text-center">
           <div className="mb-2">{current.icon}</div>
           <DialogTitle className="text-lg">{current.title}</DialogTitle>
@@ -80,17 +80,6 @@ export const OnboardingDialog: React.FC<Props> = ({ open, onClose }) => {
           {step < steps.length - 1 ? "Next" : "Get Started!"}
         </Button>
 
-        {step === 0 && (
-          <button
-            onClick={() => {
-              localStorage.setItem(ONBOARDING_KEY, "true");
-              onClose();
-            }}
-            className="text-xs text-muted-foreground text-center hover:underline"
-          >
-            Skip intro
-          </button>
-        )}
       </DialogContent>
     </Dialog>
   );
