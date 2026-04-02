@@ -64,7 +64,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
             size="icon"
             onClick={() => adjust("hours", 1)}
             disabled={isRunning}
-            className="h-10 w-10 rounded-full shadow-sm active:scale-95"
+            className="h-11 w-11 rounded-full border-2 shadow-md transition-all duration-150 hover:shadow-lg active:scale-90 active:translate-y-px"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -75,7 +75,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
             size="icon"
             onClick={() => adjust("hours", -1)}
             disabled={isRunning}
-            className="h-10 w-10 rounded-full shadow-sm active:scale-95"
+            className="h-11 w-11 rounded-full border-2 shadow-md transition-all duration-150 hover:shadow-lg active:scale-90 active:translate-y-px"
           >
             <Minus className="w-4 h-4" />
           </Button>
@@ -87,7 +87,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
             size="icon"
             onClick={() => adjust("minutes", 5)}
             disabled={isRunning}
-            className="h-10 w-10 rounded-full shadow-sm active:scale-95"
+            className="h-11 w-11 rounded-full border-2 shadow-md transition-all duration-150 hover:shadow-lg active:scale-90 active:translate-y-px"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -100,7 +100,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
             size="icon"
             onClick={() => adjust("minutes", -5)}
             disabled={isRunning}
-            className="h-10 w-10 rounded-full shadow-sm active:scale-95"
+            className="h-11 w-11 rounded-full border-2 shadow-md transition-all duration-150 hover:shadow-lg active:scale-90 active:translate-y-px"
           >
             <Minus className="w-4 h-4" />
           </Button>
@@ -122,9 +122,10 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
                 setHours(Math.floor(preset.seconds / 3600));
                 setMinutes((preset.seconds % 3600) / 60);
               }}
+              aria-pressed={isSelected}
               className={isSelected
-                ? "rounded-full px-4 font-semibold shadow-md shadow-primary/25 ring-2 ring-primary/30 active:scale-95"
-                : "rounded-full px-4 font-semibold shadow-sm active:scale-95"
+                ? "rounded-full border border-primary px-4 font-semibold text-primary-foreground shadow-lg ring-2 ring-primary/25 transition-all duration-150 hover:shadow-xl active:scale-95 active:translate-y-px"
+                : "rounded-full border-2 border-border bg-secondary px-4 font-semibold text-secondary-foreground shadow-md transition-all duration-150 hover:bg-accent hover:text-accent-foreground hover:shadow-lg active:scale-95 active:translate-y-px"
               }
             >
               {preset.label}
@@ -136,7 +137,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({
       <Button
         variant="timer"
         size="lg"
-        className="w-full shadow-lg active:scale-[0.98] transition-transform"
+        className="w-full border border-primary/30 shadow-xl ring-2 ring-primary/20 transition-all duration-150 hover:shadow-2xl active:scale-[0.97] active:translate-y-px"
         onClick={handleSet}
         disabled={isRunning || totalSeconds <= 0}
       >

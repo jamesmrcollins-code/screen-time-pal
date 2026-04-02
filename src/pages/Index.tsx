@@ -34,6 +34,7 @@ const Index = () => {
 
   const {
     profileTimerInfos,
+    getProfileTimerInfo,
     remainingSeconds,
     isRunning,
     isFinished,
@@ -105,10 +106,15 @@ const Index = () => {
 
   useEffect(() => {
     const limit = getTodayLimit();
-    if (limit !== null && !isRunning) {
-      setDailyTime(limit);
+    if (limit === null || isRunning) return;
+
+    if (activeId) {
+      setDailyTime(limit, activeId);
+      return;
     }
-  }, [scheduleSettings.useSchedule, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    setDailyTime(limit);
+  }, [activeId, getTodayLimit, isRunning, setDailyTime]);
 
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
@@ -157,14 +163,14 @@ const Index = () => {
       )
     : null;
 
-  const displayInfo = (focusedProfileId && profileTimerInfos.find((info) => info.profileId === focusedProfileId)) || lowestInfo;
+  const displayInfo = focusedProfileId ? getProfileTimerInfo(focusedProfileId) : lowestInfo;
   const dailyTargetProfile = profiles.find((profile) => profile.id === dailyLimitProfileId) ?? null;
   const weeklyTargetProfile = profiles.find((profile) => profile.id === weeklyLimitProfileId) ?? null;
   const dailyTargetInfo = dailyLimitProfileId
-    ? profileTimerInfos.find((info) => info.profileId === dailyLimitProfileId) ?? null
+    ? getProfileTimerInfo(dailyLimitProfileId)
     : null;
   const weeklyTargetInfo = weeklyLimitProfileId
-    ? profileTimerInfos.find((info) => info.profileId === weeklyLimitProfileId) ?? null
+    ? getProfileTimerInfo(weeklyLimitProfileId)
     : null;
 
   const handleSetDailyLimit = (seconds: number) => {
@@ -352,10 +358,11 @@ const Index = () => {
                             setDailyLimitProfileId(profile.id);
                             setFocusedProfileId(profile.id);
                           }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          aria-pressed={dailyLimitProfileId === profile.id}
+                          className={`px-3 py-2 rounded-full text-xs font-semibold border-2 shadow-sm transition-all duration-150 active:scale-95 active:translate-y-px ${
                             dailyLimitProfileId === profile.id
-                              ? "bg-primary/15 text-primary border-primary/30"
-                              : "bg-secondary text-muted-foreground border-transparent"
+                              ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary/25 shadow-md"
+                              : "bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                           }`}
                         >
                           {profile.avatar} {profile.name}
@@ -390,10 +397,11 @@ const Index = () => {
                             setWeeklyLimitProfileId(profile.id);
                             setFocusedProfileId(profile.id);
                           }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          aria-pressed={weeklyLimitProfileId === profile.id}
+                          className={`px-3 py-2 rounded-full text-xs font-semibold border-2 shadow-sm transition-all duration-150 active:scale-95 active:translate-y-px ${
                             weeklyLimitProfileId === profile.id
-                              ? "bg-primary/15 text-primary border-primary/30"
-                              : "bg-secondary text-muted-foreground border-transparent"
+                              ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary/25 shadow-md"
+                              : "bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                           }`}
                         >
                           {profile.avatar} {profile.name}
