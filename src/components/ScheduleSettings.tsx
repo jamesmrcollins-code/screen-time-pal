@@ -22,10 +22,13 @@ function formatLimit(seconds: number): string {
 export const ScheduleSettings: React.FC<Props> = ({ settings, onUpdate, onUpdateDay }) => {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-1">
+      <div className="flex items-center gap-2 mb-0.5">
         <Calendar className="w-5 h-5 text-primary" />
-        <h3 className="text-base font-bold text-foreground">Daily Schedule</h3>
+        <h3 className="text-base font-bold text-foreground">📅 Weekly Schedule</h3>
       </div>
+      <p className="text-xs text-muted-foreground mb-2">
+        Set automatic daily limits for each day of the week. These override the Quick Timer.
+      </p>
 
       <div className="flex items-center justify-between">
         <Label htmlFor="schedule-toggle" className="text-sm text-foreground">Use daily schedule</Label>

@@ -274,7 +274,8 @@ const Index = () => {
             </div>
 
             <div className="border-t border-border pt-5">
-              <h2 className="text-lg font-bold text-foreground mb-4">Set Screen Time</h2>
+              <h2 className="text-lg font-bold text-foreground mb-1">⏱️ Quick Timer</h2>
+              <p className="text-xs text-muted-foreground mb-4">Set a one-off screen time limit for right now.</p>
               <TimeSetter onSetTime={setTime} isRunning={isRunning} />
             </div>
 
