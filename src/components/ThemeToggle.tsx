@@ -15,8 +15,8 @@ export const ThemeToggle: React.FC = () => {
   }, [dark]);
 
   return (
-    <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="text-muted-foreground">
-      {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+    <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="text-muted-foreground h-9 w-9">
+      {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </Button>
   );
 };
