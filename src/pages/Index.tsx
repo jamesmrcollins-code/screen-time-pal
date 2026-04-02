@@ -196,26 +196,16 @@ const Index = () => {
           profileTimerInfos={profileTimerInfos}
         />
 
-        {/* Dual limit indicators for the binding profile */}
-        {lowestInfo && (
-          <div className="flex gap-3 text-sm">
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-              lowestInfo.activeLimit === "daily" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
-            }`}>
-              <span>📅 Daily:</span>
-              <span className="tabular-nums font-medium">{formatHM(lowestInfo.dailyRemaining)}</span>
-            </div>
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
-              lowestInfo.activeLimit === "weekly" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
-            }`}>
-              <span>📆 Weekly:</span>
-              <span className="tabular-nums font-medium">{formatHM(lowestInfo.weeklyRemaining)}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Timer */}
-        <TimerDisplay remainingSeconds={remainingSeconds} progress={progress} isRunning={isRunning} isFinished={isFinished} activeLimit={activeLimit} />
+        {/* Swipeable Timer (Daily / Weekly) */}
+        <SwipeableTimerDisplay
+          dailyRemaining={lowestInfo?.dailyRemaining ?? remainingSeconds}
+          weeklyRemaining={lowestInfo?.weeklyRemaining ?? remainingSeconds}
+          dailyProgress={lowestInfo ? (lowestInfo.dailyTotal > 0 ? lowestInfo.dailyRemaining / lowestInfo.dailyTotal : 1) : progress}
+          weeklyProgress={lowestInfo ? (lowestInfo.weeklyTotal > 0 ? lowestInfo.weeklyRemaining / lowestInfo.weeklyTotal : 1) : progress}
+          isRunning={isRunning}
+          isFinished={isFinished}
+          activeLimit={activeLimit}
+        />
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
