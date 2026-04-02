@@ -127,11 +127,11 @@ export function useScreenTimer(activeProfileIds: string[]) {
     return profileStates[id] ?? defaultProfileState();
   }, [profileStates]);
 
-  // Compute per-profile info for active profiles
-  const profileTimerInfos: ProfileTimerInfo[] = effectiveIds.map((id) => {
+  const getProfileTimerInfo = useCallback((id: string): ProfileTimerInfo => {
     const ps = getProfileState(id);
     const eff = Math.min(ps.dailyRemaining, ps.weeklyRemaining);
     const al: ActiveLimit = eff <= 0 ? "none" : ps.dailyRemaining <= ps.weeklyRemaining ? "daily" : "weekly";
+
     return {
       profileId: id,
       dailyTotal: ps.dailyTotal,
@@ -141,7 +141,10 @@ export function useScreenTimer(activeProfileIds: string[]) {
       effectiveRemaining: eff,
       activeLimit: al,
     };
-  });
+  }, [getProfileState]);
+
+  // Compute per-profile info for active profiles
+  const profileTimerInfos: ProfileTimerInfo[] = effectiveIds.map((id) => getProfileTimerInfo(id));
 
   // The overall timer shows the minimum effective remaining across active profiles
   const effectiveRemaining = profileTimerInfos.length > 0
@@ -344,6 +347,7 @@ export function useScreenTimer(activeProfileIds: string[]) {
 
   return {
     profileTimerInfos,
+    getProfileTimerInfo,
     remainingSeconds: effectiveRemaining,
     isRunning,
     isFinished,
