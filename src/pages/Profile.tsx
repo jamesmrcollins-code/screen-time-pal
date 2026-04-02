@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Timer, ArrowLeft, Phone, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FamilySharing } from "@/components/FamilySharing";
 import { toast } from "sonner";
 
 const Profile = () => {
