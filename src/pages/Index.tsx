@@ -145,27 +145,27 @@ const Index = () => {
       )}
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2">
-          <Timer className="w-6 h-6 text-primary" />
-          <h1 className="text-lg font-extrabold text-foreground font-display whitespace-nowrap">ScreenTime Pal</h1>
+      <header className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Timer className="w-5 h-5 text-primary shrink-0" />
+          <h1 className="text-base font-extrabold text-foreground font-display truncate">ScreenTime Pal</h1>
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground">
-            <Share2 className="w-5 h-5" />
+        <div className="flex items-center gap-0 shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground h-9 w-9">
+            <Share2 className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground">
-            <Palette className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground h-9 w-9">
+            <Palette className="w-4 h-4" />
           </Button>
           <ThemeToggle />
-          <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground">
-            <BarChart3 className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
+            <BarChart3 className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground">
-            <UserCircle className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground h-9 w-9">
+            <UserCircle className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground">
-            <Settings className="w-5 h-5" />
+          <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground h-9 w-9">
+            <Settings className="w-4 h-4" />
           </Button>
         </div>
       </header>
