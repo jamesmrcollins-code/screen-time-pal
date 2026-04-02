@@ -188,18 +188,25 @@ const Index = () => {
           activeIds={activeIds}
           onToggle={toggleActiveProfile}
           profileTimerInfos={profileTimerInfos}
+          focusedId={focusedProfileId}
+          onFocus={setFocusedProfileId}
         />
 
         {/* Swipeable Timer (Daily / Weekly) */}
-        <SwipeableTimerDisplay
-          dailyRemaining={lowestInfo?.dailyRemaining ?? remainingSeconds}
-          weeklyRemaining={lowestInfo?.weeklyRemaining ?? remainingSeconds}
-          dailyProgress={lowestInfo ? (lowestInfo.dailyTotal > 0 ? lowestInfo.dailyRemaining / lowestInfo.dailyTotal : 1) : progress}
-          weeklyProgress={lowestInfo ? (lowestInfo.weeklyTotal > 0 ? lowestInfo.weeklyRemaining / lowestInfo.weeklyTotal : 1) : progress}
-          isRunning={isRunning}
-          isFinished={isFinished}
-          activeLimit={activeLimit}
-        />
+        {(() => {
+          const displayInfo = (focusedProfileId && profileTimerInfos.find(i => i.profileId === focusedProfileId)) || lowestInfo;
+          return (
+            <SwipeableTimerDisplay
+              dailyRemaining={displayInfo?.dailyRemaining ?? remainingSeconds}
+              weeklyRemaining={displayInfo?.weeklyRemaining ?? remainingSeconds}
+              dailyProgress={displayInfo ? (displayInfo.dailyTotal > 0 ? displayInfo.dailyRemaining / displayInfo.dailyTotal : 1) : progress}
+              weeklyProgress={displayInfo ? (displayInfo.weeklyTotal > 0 ? displayInfo.weeklyRemaining / displayInfo.weeklyTotal : 1) : progress}
+              isRunning={isRunning}
+              isFinished={isFinished}
+              activeLimit={activeLimit}
+            />
+          );
+        })()}
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
