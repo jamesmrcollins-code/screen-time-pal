@@ -80,17 +80,6 @@ export const OnboardingDialog: React.FC<Props> = ({ open, onClose }) => {
           {step < steps.length - 1 ? "Next" : "Get Started!"}
         </Button>
 
-        {step === 0 && (
-          <button
-            onClick={() => {
-              localStorage.setItem(ONBOARDING_KEY, "true");
-              onClose();
-            }}
-            className="text-xs text-muted-foreground text-center hover:underline"
-          >
-            Skip intro
-          </button>
-        )}
       </DialogContent>
     </Dialog>
   );
