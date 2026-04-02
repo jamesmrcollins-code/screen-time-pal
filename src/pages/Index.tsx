@@ -34,6 +34,7 @@ const Index = () => {
 
   const {
     profileTimerInfos,
+    getProfileTimerInfo,
     remainingSeconds,
     isRunning,
     isFinished,
@@ -105,10 +106,15 @@ const Index = () => {
 
   useEffect(() => {
     const limit = getTodayLimit();
-    if (limit !== null && !isRunning) {
-      setDailyTime(limit);
+    if (limit === null || isRunning) return;
+
+    if (activeId) {
+      setDailyTime(limit, activeId);
+      return;
     }
-  }, [scheduleSettings.useSchedule, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    setDailyTime(limit);
+  }, [activeId, getTodayLimit, isRunning, setDailyTime]);
 
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
@@ -157,14 +163,14 @@ const Index = () => {
       )
     : null;
 
-  const displayInfo = (focusedProfileId && profileTimerInfos.find((info) => info.profileId === focusedProfileId)) || lowestInfo;
+  const displayInfo = focusedProfileId ? getProfileTimerInfo(focusedProfileId) : lowestInfo;
   const dailyTargetProfile = profiles.find((profile) => profile.id === dailyLimitProfileId) ?? null;
   const weeklyTargetProfile = profiles.find((profile) => profile.id === weeklyLimitProfileId) ?? null;
   const dailyTargetInfo = dailyLimitProfileId
-    ? profileTimerInfos.find((info) => info.profileId === dailyLimitProfileId) ?? null
+    ? getProfileTimerInfo(dailyLimitProfileId)
     : null;
   const weeklyTargetInfo = weeklyLimitProfileId
-    ? profileTimerInfos.find((info) => info.profileId === weeklyLimitProfileId) ?? null
+    ? getProfileTimerInfo(weeklyLimitProfileId)
     : null;
 
   const handleSetDailyLimit = (seconds: number) => {
