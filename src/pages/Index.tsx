@@ -29,10 +29,19 @@ import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, P
 import { ReferFriend } from "@/components/ReferFriend";
 import { useAuth } from "@/hooks/useAuth";
 
+function formatHM(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
 const Index = () => {
   const {
-    remainingSeconds, isRunning, isFinished, mode, progress,
-    start, pause, reset, setTime, changeMode, requestNotificationPermission,
+    dailyRemainingSeconds, weeklyRemainingSeconds,
+    remainingSeconds, isRunning, isFinished, activeLimit, progress,
+    start, pause, reset, setDailyTime, setWeeklyTime, requestNotificationPermission,
   } = useScreenTimer();
 
   const { profiles, activeId, addProfile, removeProfile, switchProfile } = useProfiles();
@@ -69,7 +78,7 @@ const Index = () => {
   useEffect(() => {
     const limit = getTodayLimit();
     if (limit !== null && !isRunning) {
-      setTime(limit);
+      setDailyTime(limit);
     }
   }, [scheduleSettings.useSchedule, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -113,7 +122,7 @@ const Index = () => {
   };
 
   const handleSettingsToggle = () => {
-    if (pinRequired && !showSettings) return; // Can't open settings when locked
+    if (pinRequired && !showSettings) return;
     setShowSettings(!showSettings);
   };
 
@@ -182,28 +191,24 @@ const Index = () => {
           </div>
         )}
 
-        {/* Mode Toggle */}
-        <div className="flex bg-secondary rounded-full p-1 gap-1">
-          <button
-            onClick={() => changeMode("daily")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-              mode === "daily" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            Daily
-          </button>
-          <button
-            onClick={() => changeMode("weekly")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-              mode === "weekly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-            }`}
-          >
-            Weekly
-          </button>
+        {/* Dual limit indicators */}
+        <div className="flex gap-3 text-sm">
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+            activeLimit === "daily" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
+          }`}>
+            <span>📅 Daily:</span>
+            <span className="tabular-nums font-medium">{formatHM(dailyRemainingSeconds)}</span>
+          </div>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border ${
+            activeLimit === "weekly" ? "bg-primary/10 border-primary/30 text-primary font-semibold" : "bg-secondary border-border text-muted-foreground"
+          }`}>
+            <span>📆 Weekly:</span>
+            <span className="tabular-nums font-medium">{formatHM(weeklyRemainingSeconds)}</span>
+          </div>
         </div>
 
         {/* Timer */}
-        <TimerDisplay remainingSeconds={remainingSeconds} progress={progress} isRunning={isRunning} isFinished={isFinished} />
+        <TimerDisplay remainingSeconds={remainingSeconds} progress={progress} isRunning={isRunning} isFinished={isFinished} activeLimit={activeLimit} />
 
         {/* Controls */}
         <div className="flex gap-4 items-center">
@@ -274,9 +279,15 @@ const Index = () => {
             </div>
 
             <div className="border-t border-border pt-5">
-              <h2 className="text-lg font-bold text-foreground mb-1">⏱️ Quick Timer</h2>
-              <p className="text-xs text-muted-foreground mb-4">Set a one-off screen time limit for right now.</p>
-              <TimeSetter onSetTime={setTime} isRunning={isRunning} />
+              <h2 className="text-lg font-bold text-foreground mb-1">📅 Daily Limit</h2>
+              <p className="text-xs text-muted-foreground mb-4">Set today's screen time limit. Resets each day.</p>
+              <TimeSetter onSetTime={setDailyTime} isRunning={isRunning} />
+            </div>
+
+            <div className="border-t border-border pt-5">
+              <h2 className="text-lg font-bold text-foreground mb-1">📆 Weekly Limit</h2>
+              <p className="text-xs text-muted-foreground mb-4">Set total screen time for the week. Usage counts against both daily and weekly limits.</p>
+              <TimeSetter onSetTime={setWeeklyTime} isRunning={isRunning} presetOptions="weekly" />
             </div>
 
             <div className="border-t border-border pt-5">
@@ -305,7 +316,10 @@ const Index = () => {
           <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 max-w-sm w-full text-center">
             <p className="text-accent font-semibold text-lg">⏰ Time's Up!</p>
             <p className="text-muted-foreground text-sm mt-1">
-              Screen time limit has been reached. Reset to start a new session.
+              {activeLimit === "weekly" || weeklyRemainingSeconds <= 0
+                ? "Your weekly screen time limit has been reached."
+                : "Your daily screen time limit has been reached."}
+              {" "}Reset to start a new session.
             </p>
           </div>
         )}

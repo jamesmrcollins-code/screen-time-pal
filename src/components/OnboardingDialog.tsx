@@ -19,13 +19,13 @@ interface Props {
 const steps = [
   {
     icon: <Timer className="w-8 h-8 text-primary" />,
-    title: "Set Your Limit",
-    desc: "Choose a daily screen time limit using the timer. You can also set different limits for each day of the week in Settings.",
+    title: "Set Your Limits",
+    desc: "Set a daily limit (e.g. 2 hours) and a weekly limit (e.g. 10 hours). The timer always counts down from whichever limit is lower — so if you've used most of your weekly time, you'll see that instead.",
   },
   {
     icon: <Clock className="w-8 h-8 text-accent" />,
     title: "Track Your Time",
-    desc: "Press play when you start using screens. The timer counts down and logs your usage automatically.",
+    desc: "Press play when you start using screens. Usage counts against both your daily and weekly limits at the same time.",
   },
   {
     icon: <Star className="w-8 h-8 text-timer-warning" />,

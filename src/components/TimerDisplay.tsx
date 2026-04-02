@@ -1,11 +1,13 @@
 import React from "react";
 import { ProgressRing } from "./ProgressRing";
+import type { ActiveLimit } from "@/hooks/useScreenTimer";
 
 interface TimerDisplayProps {
   remainingSeconds: number;
   progress: number;
   isRunning: boolean;
   isFinished: boolean;
+  activeLimit?: ActiveLimit;
 }
 
 function formatTime(totalSeconds: number): { hours: string; minutes: string; seconds: string } {
@@ -24,8 +26,17 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
   progress,
   isRunning,
   isFinished,
+  activeLimit,
 }) => {
   const { hours, minutes, seconds } = formatTime(remainingSeconds);
+
+  const statusText = isFinished
+    ? "Time's up!"
+    : isRunning
+    ? activeLimit === "weekly"
+      ? "Weekly limit active"
+      : "Daily limit active"
+    : "Paused";
 
   return (
     <div className="relative flex items-center justify-center">
@@ -45,7 +56,7 @@ export const TimerDisplay: React.FC<TimerDisplayProps> = ({
           </span>
         </div>
         <span className="text-sm text-muted-foreground font-medium mt-1">
-          {isFinished ? "Time's up!" : isRunning ? "Screen time active" : "Paused"}
+          {statusText}
         </span>
       </div>
     </div>
