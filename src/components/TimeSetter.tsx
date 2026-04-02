@@ -5,22 +5,32 @@ import { Minus, Plus } from "lucide-react";
 interface TimeSetterProps {
   onSetTime: (seconds: number) => void;
   isRunning: boolean;
+  presetOptions?: "daily" | "weekly";
 }
 
-const PRESETS = [
+const DAILY_PRESETS = [
   { label: "30m", seconds: 30 * 60 },
   { label: "1h", seconds: 60 * 60 },
   { label: "1.5h", seconds: 90 * 60 },
   { label: "2h", seconds: 120 * 60 },
 ];
 
-export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning }) => {
-  const [hours, setHours] = useState(1);
+const WEEKLY_PRESETS = [
+  { label: "5h", seconds: 5 * 3600 },
+  { label: "7h", seconds: 7 * 3600 },
+  { label: "10h", seconds: 10 * 3600 },
+  { label: "14h", seconds: 14 * 3600 },
+];
+
+export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning, presetOptions = "daily" }) => {
+  const [hours, setHours] = useState(presetOptions === "weekly" ? 7 : 1);
   const [minutes, setMinutes] = useState(0);
+
+  const presets = presetOptions === "weekly" ? WEEKLY_PRESETS : DAILY_PRESETS;
 
   const adjust = (field: "hours" | "minutes", delta: number) => {
     if (field === "hours") {
-      setHours(Math.max(0, Math.min(23, hours + delta)));
+      setHours(Math.max(0, Math.min(99, hours + delta)));
     } else {
       setMinutes(Math.max(0, Math.min(55, minutes + delta)));
     }
@@ -60,7 +70,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning }) 
       </div>
 
       <div className="flex gap-2 justify-center flex-wrap">
-        {PRESETS.map((p) => (
+        {presets.map((p) => (
           <Button
             key={p.label}
             variant="secondary"
@@ -79,7 +89,7 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning }) 
       </div>
 
       <Button variant="timer" size="lg" className="w-full" onClick={handleSet} disabled={isRunning}>
-        Set Timer
+        Set {presetOptions === "weekly" ? "Weekly" : "Daily"} Limit
       </Button>
     </div>
   );
