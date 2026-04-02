@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Index from "@/pages/Index";
 
@@ -182,24 +182,25 @@ describe("Index per-profile limits", () => {
   });
 
   it("loads and saves limits for the selected profile even when that profile is inactive", () => {
-    const { container } = render(<Index />);
+    const view = render(<Index />);
+    const { container } = view;
 
     const headerButtons = container.querySelectorAll("header button");
-    fireEvent.click(headerButtons[4]!);
+    headerButtons[4]?.click();
 
-    const [dailyBobButton, weeklyBobButton] = screen.getAllByText(/Bob/);
-    fireEvent.click(dailyBobButton);
+    const [dailyBobButton, weeklyBobButton] = view.getAllByText(/Bob/);
+    dailyBobButton.click();
 
-    expect(screen.getByTestId("daily-value")).toHaveTextContent("1800");
+    expect(view.getByTestId("daily-value")).toHaveTextContent("1800");
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply daily" }));
+    view.getByRole("button", { name: "Apply daily" }).click();
     expect(mocks.setDailyTime).toHaveBeenCalledWith(555, "p2");
 
-    fireEvent.click(weeklyBobButton);
+    weeklyBobButton.click();
 
-    expect(screen.getByTestId("weekly-value")).toHaveTextContent("14400");
+    expect(view.getByTestId("weekly-value")).toHaveTextContent("14400");
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply weekly" }));
+    view.getByRole("button", { name: "Apply weekly" }).click();
     expect(mocks.setWeeklyTime).toHaveBeenCalledWith(777, "p2");
   });
 });

@@ -358,10 +358,11 @@ const Index = () => {
                             setDailyLimitProfileId(profile.id);
                             setFocusedProfileId(profile.id);
                           }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          aria-pressed={dailyLimitProfileId === profile.id}
+                          className={`px-3 py-2 rounded-full text-xs font-semibold border-2 shadow-sm transition-all duration-150 active:scale-95 active:translate-y-px ${
                             dailyLimitProfileId === profile.id
-                              ? "bg-primary/15 text-primary border-primary/30"
-                              : "bg-secondary text-muted-foreground border-transparent"
+                              ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary/25 shadow-md"
+                              : "bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                           }`}
                         >
                           {profile.avatar} {profile.name}
@@ -396,10 +397,11 @@ const Index = () => {
                             setWeeklyLimitProfileId(profile.id);
                             setFocusedProfileId(profile.id);
                           }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          aria-pressed={weeklyLimitProfileId === profile.id}
+                          className={`px-3 py-2 rounded-full text-xs font-semibold border-2 shadow-sm transition-all duration-150 active:scale-95 active:translate-y-px ${
                             weeklyLimitProfileId === profile.id
-                              ? "bg-primary/15 text-primary border-primary/30"
-                              : "bg-secondary text-muted-foreground border-transparent"
+                              ? "bg-primary text-primary-foreground border-primary ring-2 ring-primary/25 shadow-md"
+                              : "bg-secondary text-secondary-foreground border-border hover:bg-accent hover:text-accent-foreground"
                           }`}
                         >
                           {profile.avatar} {profile.name}
