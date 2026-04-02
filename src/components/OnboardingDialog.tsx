@@ -55,7 +55,7 @@ export const OnboardingDialog: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-xs rounded-2xl" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-xs rounded-2xl [&>button[data-radix-collection-item]]:hidden [&>.absolute.right-4.top-4]:hidden [&>button:last-of-type:not(.w-full)]:hidden" hideClose onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader className="items-center text-center">
           <div className="mb-2">{current.icon}</div>
           <DialogTitle className="text-lg">{current.title}</DialogTitle>
