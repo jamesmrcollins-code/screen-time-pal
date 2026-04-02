@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
+import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { ProfileSelector } from "@/components/ProfileSelector";
