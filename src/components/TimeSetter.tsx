@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 
@@ -6,6 +6,7 @@ interface TimeSetterProps {
   onSetTime: (seconds: number) => void;
   isRunning: boolean;
   presetOptions?: "daily" | "weekly";
+  valueSeconds?: number;
 }
 
 const DAILY_PRESETS = [
@@ -22,11 +23,23 @@ const WEEKLY_PRESETS = [
   { label: "14h", seconds: 14 * 3600 },
 ];
 
-export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning, presetOptions = "daily" }) => {
+export const TimeSetter: React.FC<TimeSetterProps> = ({
+  onSetTime,
+  isRunning,
+  presetOptions = "daily",
+  valueSeconds,
+}) => {
   const [hours, setHours] = useState(presetOptions === "weekly" ? 7 : 1);
   const [minutes, setMinutes] = useState(0);
 
   const presets = presetOptions === "weekly" ? WEEKLY_PRESETS : DAILY_PRESETS;
+
+  useEffect(() => {
+    if (typeof valueSeconds !== "number") return;
+
+    setHours(Math.floor(valueSeconds / 3600));
+    setMinutes(Math.floor((valueSeconds % 3600) / 60));
+  }, [valueSeconds]);
 
   const adjust = (field: "hours" | "minutes", delta: number) => {
     if (field === "hours") {
@@ -70,20 +83,20 @@ export const TimeSetter: React.FC<TimeSetterProps> = ({ onSetTime, isRunning, pr
       </div>
 
       <div className="flex gap-2 justify-center flex-wrap">
-        {presets.map((p) => (
+        {presets.map((preset) => (
           <Button
-            key={p.label}
+            key={preset.label}
             variant="secondary"
             size="sm"
             disabled={isRunning}
             onClick={() => {
-              setHours(Math.floor(p.seconds / 3600));
-              setMinutes((p.seconds % 3600) / 60);
-              onSetTime(p.seconds);
+              setHours(Math.floor(preset.seconds / 3600));
+              setMinutes((preset.seconds % 3600) / 60);
+              onSetTime(preset.seconds);
             }}
             className="rounded-full px-4 font-semibold"
           >
-            {p.label}
+            {preset.label}
           </Button>
         ))}
       </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -29,15 +28,23 @@ import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
 import { ReferFriend } from "@/components/ReferFriend";
-import { useAuth } from "@/hooks/useAuth";
-
 
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
 
   const {
-    profileTimerInfos, remainingSeconds, isRunning, isFinished, activeLimit, progress,
-    start, pause, reset, setDailyTime, setWeeklyTime, requestNotificationPermission,
+    profileTimerInfos,
+    remainingSeconds,
+    isRunning,
+    isFinished,
+    activeLimit,
+    progress,
+    start,
+    pause,
+    reset,
+    setDailyTime,
+    setWeeklyTime,
+    requestNotificationPermission,
   } = useScreenTimer(activeIds);
 
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
@@ -48,30 +55,54 @@ const Index = () => {
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
-  const { activeThemeId, unlockedIds, isUnlocked: isThemeUnlocked, unlockTheme, setActiveTheme, themes, setThemeFromCloud } = useAppTheme(rewards.totalStars);
+  const {
+    activeThemeId,
+    unlockedIds,
+    isUnlocked: isThemeUnlocked,
+    unlockTheme,
+    setActiveTheme,
+    setThemeFromCloud,
+  } = useAppTheme(rewards.totalStars);
   const navigate = useNavigate();
 
-  // Cloud sync
   useCloudSync(
-    usageLogData, setLogBulk,
-    rewardsRaw, setRewardsFromCloud,
-    { unlockedIds, activeThemeId }, setThemeFromCloud,
-    scheduleSettings, setScheduleFromCloud
+    usageLogData,
+    setLogBulk,
+    rewardsRaw,
+    setRewardsFromCloud,
+    { unlockedIds, activeThemeId },
+    setThemeFromCloud,
+    scheduleSettings,
+    setScheduleFromCloud
   );
+
   const [showSettings, setShowSettings] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showReferFriend, setShowReferFriend] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [focusedProfileId, setFocusedProfileId] = useState<string | null>(null);
-  const [limitProfileId, setLimitProfileId] = useState<string | null>(null);
+  const [dailyLimitProfileId, setDailyLimitProfileId] = useState<string | null>(activeId ?? profiles[0]?.id ?? null);
+  const [weeklyLimitProfileId, setWeeklyLimitProfileId] = useState<string | null>(activeId ?? profiles[0]?.id ?? null);
   const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
 
   const pinRequired = hasPin() && !isUnlocked;
+  const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
 
-  // Auto-apply schedule limit
+  useEffect(() => {
+    const hasProfile = (id: string | null) => !!id && profiles.some((profile) => profile.id === id);
+
+    if (!hasProfile(dailyLimitProfileId)) {
+      setDailyLimitProfileId(fallbackProfileId);
+    }
+
+    if (!hasProfile(weeklyLimitProfileId)) {
+      setWeeklyLimitProfileId(fallbackProfileId);
+    }
+  }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId]);
+
   useEffect(() => {
     const limit = getTodayLimit();
     if (limit !== null && !isRunning) {
@@ -79,7 +110,6 @@ const Index = () => {
     }
   }, [scheduleSettings.useSchedule, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Track usage
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
     if (isRunning && prevRemaining.current > remainingSeconds) {
@@ -88,7 +118,6 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
-  // Check SMS thresholds
   useEffect(() => {
     if (isRunning) checkSms(remainingSeconds);
   }, [remainingSeconds, isRunning, checkSms]);
@@ -97,7 +126,6 @@ const Index = () => {
     if (isFinished) checkSms(0);
   }, [isFinished, checkSms]);
 
-  // Lock screen & alarm on finish
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
     if (isFinished && !lockAlarmTriggeredRef.current) {
@@ -123,10 +151,39 @@ const Index = () => {
     setShowSettings(!showSettings);
   };
 
-  // Find the profile that's closest to running out
   const lowestInfo = profileTimerInfos.length > 0
-    ? profileTimerInfos.reduce((min, p) => p.effectiveRemaining < min.effectiveRemaining ? p : min)
+    ? profileTimerInfos.reduce((min, profile) =>
+        profile.effectiveRemaining < min.effectiveRemaining ? profile : min
+      )
     : null;
+
+  const displayInfo = (focusedProfileId && profileTimerInfos.find((info) => info.profileId === focusedProfileId)) || lowestInfo;
+  const dailyTargetProfile = profiles.find((profile) => profile.id === dailyLimitProfileId) ?? null;
+  const weeklyTargetProfile = profiles.find((profile) => profile.id === weeklyLimitProfileId) ?? null;
+  const dailyTargetInfo = dailyLimitProfileId
+    ? profileTimerInfos.find((info) => info.profileId === dailyLimitProfileId) ?? null
+    : null;
+  const weeklyTargetInfo = weeklyLimitProfileId
+    ? profileTimerInfos.find((info) => info.profileId === weeklyLimitProfileId) ?? null
+    : null;
+
+  const handleSetDailyLimit = (seconds: number) => {
+    if (dailyLimitProfileId) {
+      setDailyTime(seconds, dailyLimitProfileId);
+      return;
+    }
+
+    setDailyTime(seconds);
+  };
+
+  const handleSetWeeklyLimit = (seconds: number) => {
+    if (weeklyLimitProfileId) {
+      setWeeklyTime(seconds, weeklyLimitProfileId);
+      return;
+    }
+
+    setWeeklyTime(seconds);
+  };
 
   return (
     <>
@@ -139,234 +196,257 @@ const Index = () => {
           onStopAlarm={stopAlarm}
         />
       )}
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Timer className="w-5 h-5 text-primary shrink-0" />
-          <h1 className="text-base font-extrabold text-foreground font-display truncate">ScreenTime Pal</h1>
-        </div>
-        <div className="flex items-center gap-0 shrink-0">
-          <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground h-9 w-9">
-            <Share2 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground h-9 w-9">
-            <Palette className="w-4 h-4" />
-          </Button>
-          <ThemeToggle />
-          <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
-            <BarChart3 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground h-9 w-9">
-            <UserCircle className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground h-9 w-9">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </div>
-      </header>
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Timer className="w-5 h-5 text-primary shrink-0" />
+            <h1 className="text-base font-extrabold text-foreground font-display truncate">ScreenTime Pal</h1>
+          </div>
+          <div className="flex items-center gap-0 shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground h-9 w-9">
+              <Share2 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground h-9 w-9">
+              <Palette className="w-4 h-4" />
+            </Button>
+            <ThemeToggle />
+            <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
+              <BarChart3 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} className="text-muted-foreground h-9 w-9">
+              <UserCircle className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleSettingsToggle} className="text-muted-foreground h-9 w-9">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
+        </header>
 
-      <ThemePicker
-        open={showThemePicker}
-        onOpenChange={setShowThemePicker}
-        totalStars={rewards.totalStars}
-        activeThemeId={activeThemeId}
-        isUnlocked={isThemeUnlocked}
-        unlockTheme={unlockTheme}
-        setActiveTheme={setActiveTheme}
-      />
-
-      <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
-
-      {/* Main */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-5">
-        {/* Rewards */}
-        <RewardsBadge rewards={rewards} />
-
-        {/* Active Users Selector */}
-        <ActiveUsersSelector
-          profiles={profiles}
-          activeIds={activeIds}
-          onToggle={toggleActiveProfile}
-          profileTimerInfos={profileTimerInfos}
-          focusedId={focusedProfileId}
-          onFocus={setFocusedProfileId}
+        <ThemePicker
+          open={showThemePicker}
+          onOpenChange={setShowThemePicker}
+          totalStars={rewards.totalStars}
+          activeThemeId={activeThemeId}
+          isUnlocked={isThemeUnlocked}
+          unlockTheme={unlockTheme}
+          setActiveTheme={setActiveTheme}
         />
 
-        {/* Swipeable Timer (Daily / Weekly) */}
-        {(() => {
-          const displayInfo = (focusedProfileId && profileTimerInfos.find(i => i.profileId === focusedProfileId)) || lowestInfo;
-          return (
-            <SwipeableTimerDisplay
-              dailyRemaining={displayInfo?.dailyRemaining ?? remainingSeconds}
-              weeklyRemaining={displayInfo?.weeklyRemaining ?? remainingSeconds}
-              dailyProgress={displayInfo ? (displayInfo.dailyTotal > 0 ? displayInfo.dailyRemaining / displayInfo.dailyTotal : 1) : progress}
-              weeklyProgress={displayInfo ? (displayInfo.weeklyTotal > 0 ? displayInfo.weeklyRemaining / displayInfo.weeklyTotal : 1) : progress}
-              isRunning={isRunning}
-              isFinished={isFinished}
-              activeLimit={activeLimit}
-            />
-          );
-        })()}
+        <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
 
-        {/* Controls */}
-        <div className="flex gap-4 items-center">
-          <Button
-            variant="secondary" size="icon"
-            onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
-            className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
-            disabled={pinRequired}
-          >
-            <RotateCcw className="w-5 h-5" />
-          </Button>
+        <main className="flex-1 flex flex-col items-center justify-center px-6 pb-8 gap-5">
+          <RewardsBadge rewards={rewards} />
 
-          {isFinished ? (
+          <ActiveUsersSelector
+            profiles={profiles}
+            activeIds={activeIds}
+            onToggle={toggleActiveProfile}
+            profileTimerInfos={profileTimerInfos}
+            focusedId={focusedProfileId}
+            onFocus={setFocusedProfileId}
+          />
+
+          <SwipeableTimerDisplay
+            dailyRemaining={displayInfo?.dailyRemaining ?? remainingSeconds}
+            weeklyRemaining={displayInfo?.weeklyRemaining ?? remainingSeconds}
+            dailyProgress={displayInfo ? (displayInfo.dailyTotal > 0 ? displayInfo.dailyRemaining / displayInfo.dailyTotal : 1) : progress}
+            weeklyProgress={displayInfo ? (displayInfo.weeklyTotal > 0 ? displayInfo.weeklyRemaining / displayInfo.weeklyTotal : 1) : progress}
+            isRunning={isRunning}
+            isFinished={isFinished}
+            activeLimit={activeLimit}
+          />
+
+          <div className="flex gap-4 items-center">
             <Button
-              variant="danger" size="lg"
-              onClick={() => { if (!pinRequired) { reset(); resetSent(); } }}
-              className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+              variant="secondary"
+              size="icon"
+              onClick={() => {
+                if (!pinRequired) {
+                  reset();
+                  resetSent();
+                }
+              }}
+              className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
               disabled={pinRequired}
             >
-              <RotateCcw className="w-6 h-6" />
+              <RotateCcw className="w-5 h-5" />
             </Button>
-          ) : isRunning ? (
+
+            {isFinished ? (
+              <Button
+                variant="danger"
+                size="lg"
+                onClick={() => {
+                  if (!pinRequired) {
+                    reset();
+                    resetSent();
+                  }
+                }}
+                className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+                disabled={pinRequired}
+              >
+                <RotateCcw className="w-6 h-6" />
+              </Button>
+            ) : isRunning ? (
+              <Button
+                variant="danger"
+                size="lg"
+                onClick={() => {
+                  if (!pinRequired) {
+                    pause();
+                  }
+                }}
+                className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+                disabled={pinRequired}
+              >
+                <Pause className="w-6 h-6" />
+              </Button>
+            ) : (
+              <Button variant="timer" size="lg" onClick={start} className="h-16 w-16 rounded-full p-0">
+                <Play className="w-6 h-6 ml-1" />
+              </Button>
+            )}
+
             <Button
-              variant="danger" size="lg"
-              onClick={() => { if (!pinRequired) { pause(); } }}
-              className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
-              disabled={pinRequired}
+              variant={notifEnabled ? "secondary" : "outline"}
+              size="icon"
+              onClick={handleEnableNotifications}
+              className="rounded-full h-12 w-12"
             >
-              <Pause className="w-6 h-6" />
+              <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
             </Button>
-          ) : (
-            <Button variant="timer" size="lg" onClick={start} className="h-16 w-16 rounded-full p-0">
-              <Play className="w-6 h-6 ml-1" />
-            </Button>
+          </div>
+
+          {showSettings && (
+            <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6 animate-in fade-in slide-in-from-top-2">
+              <PinLock
+                hasPin={hasPin()}
+                isUnlocked={isUnlocked}
+                onVerify={verifyPin}
+                onSetPin={setPin}
+                onRemovePin={removePin}
+                onLock={lock}
+              />
+
+              <div className="border-t border-border pt-5">
+                <ProfileSelector
+                  profiles={profiles}
+                  activeId={activeId}
+                  onSwitch={switchProfile}
+                  onAdd={addProfile}
+                  onRemove={removeProfile}
+                />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <h2 className="text-lg font-bold text-foreground mb-1">📅 Daily Limit</h2>
+                <p className="text-xs text-muted-foreground mb-3">Choose one profile, then set that child&apos;s daily limit.</p>
+                {profiles.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    <div className="flex gap-2 flex-wrap">
+                      {profiles.map((profile) => (
+                        <button
+                          key={`daily-${profile.id}`}
+                          type="button"
+                          onClick={() => {
+                            setDailyLimitProfileId(profile.id);
+                            setFocusedProfileId(profile.id);
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                            dailyLimitProfileId === profile.id
+                              ? "bg-primary/15 text-primary border-primary/30"
+                              : "bg-secondary text-muted-foreground border-transparent"
+                          }`}
+                        >
+                          {profile.avatar} {profile.name}
+                        </button>
+                      ))}
+                    </div>
+                    {dailyTargetProfile && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Setting daily limit for <span className="font-semibold text-foreground">{dailyTargetProfile.avatar} {dailyTargetProfile.name}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+                <TimeSetter
+                  onSetTime={handleSetDailyLimit}
+                  isRunning={isRunning}
+                  valueSeconds={dailyTargetInfo?.dailyTotal}
+                />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <h2 className="text-lg font-bold text-foreground mb-1">📆 Weekly Limit</h2>
+                <p className="text-xs text-muted-foreground mb-3">Choose one profile, then set that child&apos;s weekly limit.</p>
+                {profiles.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    <div className="flex gap-2 flex-wrap">
+                      {profiles.map((profile) => (
+                        <button
+                          key={`weekly-${profile.id}`}
+                          type="button"
+                          onClick={() => {
+                            setWeeklyLimitProfileId(profile.id);
+                            setFocusedProfileId(profile.id);
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                            weeklyLimitProfileId === profile.id
+                              ? "bg-primary/15 text-primary border-primary/30"
+                              : "bg-secondary text-muted-foreground border-transparent"
+                          }`}
+                        >
+                          {profile.avatar} {profile.name}
+                        </button>
+                      ))}
+                    </div>
+                    {weeklyTargetProfile && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Setting weekly limit for <span className="font-semibold text-foreground">{weeklyTargetProfile.avatar} {weeklyTargetProfile.name}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+                <TimeSetter
+                  onSetTime={handleSetWeeklyLimit}
+                  isRunning={isRunning}
+                  presetOptions="weekly"
+                  valueSeconds={weeklyTargetInfo?.weeklyTotal}
+                />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <ScheduleSettingsUI
+                  settings={scheduleSettings}
+                  onUpdate={updateSchedule}
+                  onUpdateDay={updateDay}
+                />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <LockScreenSettings
+                  settings={lockSettings}
+                  onUpdate={updateLockSettings}
+                  hasPinSet={hasPin()}
+                />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
+              </div>
+            </div>
           )}
 
-          <Button
-            variant={notifEnabled ? "secondary" : "outline"}
-            size="icon"
-            onClick={handleEnableNotifications}
-            className="rounded-full h-12 w-12"
-          >
-            <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
-          </Button>
-        </div>
-
-        {/* Settings Panel */}
-        {showSettings && (
-          <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6 animate-in fade-in slide-in-from-top-2">
-            {/* PIN Lock */}
-            <PinLock
-              hasPin={hasPin()}
-              isUnlocked={isUnlocked}
-              onVerify={verifyPin}
-              onSetPin={setPin}
-              onRemovePin={removePin}
-              onLock={lock}
-            />
-
-            <div className="border-t border-border pt-5">
-              <ProfileSelector
-                profiles={profiles}
-                activeId={activeId}
-                onSwitch={switchProfile}
-                onAdd={addProfile}
-                onRemove={removeProfile}
-              />
+          {isFinished && (
+            <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 max-w-sm w-full text-center">
+              <p className="text-accent font-semibold text-lg">⏰ Time&apos;s Up!</p>
+              <p className="text-muted-foreground text-sm mt-1">
+                Screen time limit has been reached. Reset to start a new session.
+              </p>
             </div>
-
-            <div className="border-t border-border pt-5">
-              <h2 className="text-lg font-bold text-foreground mb-1">📅 Daily Limit</h2>
-              <p className="text-xs text-muted-foreground mb-3">Set today's screen time limit. Resets each day.</p>
-              {profiles.length > 0 && (
-                <div className="flex gap-2 flex-wrap mb-4">
-                  <button
-                    onClick={() => setLimitProfileId(null)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                      limitProfileId === null
-                        ? "bg-primary/15 text-primary border-primary/30"
-                        : "bg-secondary text-muted-foreground border-transparent"
-                    }`}
-                  >All profiles</button>
-                  {profiles.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => setLimitProfileId(p.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                        limitProfileId === p.id
-                          ? "bg-primary/15 text-primary border-primary/30"
-                          : "bg-secondary text-muted-foreground border-transparent"
-                      }`}
-                    >{p.avatar} {p.name}</button>
-                  ))}
-                </div>
-              )}
-              <TimeSetter onSetTime={(s) => limitProfileId ? setDailyTime(s, limitProfileId) : setDailyTime(s)} isRunning={isRunning} />
-            </div>
-
-            <div className="border-t border-border pt-5">
-              <h2 className="text-lg font-bold text-foreground mb-1">📆 Weekly Limit</h2>
-              <p className="text-xs text-muted-foreground mb-3">Set total screen time for the week.</p>
-              {profiles.length > 0 && (
-                <div className="flex gap-2 flex-wrap mb-4">
-                  <button
-                    onClick={() => setLimitProfileId(null)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                      limitProfileId === null
-                        ? "bg-primary/15 text-primary border-primary/30"
-                        : "bg-secondary text-muted-foreground border-transparent"
-                    }`}
-                  >All profiles</button>
-                  {profiles.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => setLimitProfileId(p.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                        limitProfileId === p.id
-                          ? "bg-primary/15 text-primary border-primary/30"
-                          : "bg-secondary text-muted-foreground border-transparent"
-                      }`}
-                    >{p.avatar} {p.name}</button>
-                  ))}
-                </div>
-              )}
-              <TimeSetter onSetTime={(s) => limitProfileId ? setWeeklyTime(s, limitProfileId) : setWeeklyTime(s)} isRunning={isRunning} presetOptions="weekly" />
-            </div>
-
-            <div className="border-t border-border pt-5">
-              <ScheduleSettingsUI
-                settings={scheduleSettings}
-                onUpdate={updateSchedule}
-                onUpdateDay={updateDay}
-              />
-            </div>
-
-            <div className="border-t border-border pt-5">
-              <LockScreenSettings
-                settings={lockSettings}
-                onUpdate={updateLockSettings}
-                hasPinSet={hasPin()}
-              />
-            </div>
-
-            <div className="border-t border-border pt-5">
-              <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
-            </div>
-          </div>
-        )}
-
-        {isFinished && (
-          <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 max-w-sm w-full text-center">
-            <p className="text-accent font-semibold text-lg">⏰ Time's Up!</p>
-            <p className="text-muted-foreground text-sm mt-1">
-              Screen time limit has been reached. Reset to start a new session.
-            </p>
-          </div>
-        )}
-      </main>
-    </div>
+          )}
+        </main>
+      </div>
     </>
   );
 };
