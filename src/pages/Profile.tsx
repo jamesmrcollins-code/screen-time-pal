@@ -97,6 +97,8 @@ const Profile = () => {
           </form>
         </div>
 
+        <FamilySharing />
+
         <Button variant="outline" className="w-full h-12 rounded-xl gap-2" onClick={handleSignOut}>
           <LogOut className="w-4 h-4" />
           Sign Out
