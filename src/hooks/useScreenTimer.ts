@@ -347,6 +347,7 @@ export function useScreenTimer(activeProfileIds: string[]) {
 
   return {
     profileTimerInfos,
+    getProfileTimerInfo,
     remainingSeconds: effectiveRemaining,
     isRunning,
     isFinished,
