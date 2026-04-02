@@ -63,6 +63,7 @@ const Index = () => {
   const [showReferFriend, setShowReferFriend] = useState(false);
   const [isScreenLocked, setIsScreenLocked] = useState(false);
   const [focusedProfileId, setFocusedProfileId] = useState<string | null>(null);
+  const [limitProfileId, setLimitProfileId] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
@@ -278,14 +279,60 @@ const Index = () => {
 
             <div className="border-t border-border pt-5">
               <h2 className="text-lg font-bold text-foreground mb-1">📅 Daily Limit</h2>
-              <p className="text-xs text-muted-foreground mb-4">Set today's screen time limit for all active profiles. Resets each day.</p>
-              <TimeSetter onSetTime={setDailyTime} isRunning={isRunning} />
+              <p className="text-xs text-muted-foreground mb-3">Set today's screen time limit. Resets each day.</p>
+              {profiles.length > 0 && (
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <button
+                    onClick={() => setLimitProfileId(null)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                      limitProfileId === null
+                        ? "bg-primary/15 text-primary border-primary/30"
+                        : "bg-secondary text-muted-foreground border-transparent"
+                    }`}
+                  >All profiles</button>
+                  {profiles.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setLimitProfileId(p.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                        limitProfileId === p.id
+                          ? "bg-primary/15 text-primary border-primary/30"
+                          : "bg-secondary text-muted-foreground border-transparent"
+                      }`}
+                    >{p.avatar} {p.name}</button>
+                  ))}
+                </div>
+              )}
+              <TimeSetter onSetTime={(s) => limitProfileId ? setDailyTime(s, limitProfileId) : setDailyTime(s)} isRunning={isRunning} />
             </div>
 
             <div className="border-t border-border pt-5">
               <h2 className="text-lg font-bold text-foreground mb-1">📆 Weekly Limit</h2>
-              <p className="text-xs text-muted-foreground mb-4">Set total screen time for the week. Usage counts against both daily and weekly limits.</p>
-              <TimeSetter onSetTime={setWeeklyTime} isRunning={isRunning} presetOptions="weekly" />
+              <p className="text-xs text-muted-foreground mb-3">Set total screen time for the week.</p>
+              {profiles.length > 0 && (
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <button
+                    onClick={() => setLimitProfileId(null)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                      limitProfileId === null
+                        ? "bg-primary/15 text-primary border-primary/30"
+                        : "bg-secondary text-muted-foreground border-transparent"
+                    }`}
+                  >All profiles</button>
+                  {profiles.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setLimitProfileId(p.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                        limitProfileId === p.id
+                          ? "bg-primary/15 text-primary border-primary/30"
+                          : "bg-secondary text-muted-foreground border-transparent"
+                      }`}
+                    >{p.avatar} {p.name}</button>
+                  ))}
+                </div>
+              )}
+              <TimeSetter onSetTime={(s) => limitProfileId ? setWeeklyTime(s, limitProfileId) : setWeeklyTime(s)} isRunning={isRunning} presetOptions="weekly" />
             </div>
 
             <div className="border-t border-border pt-5">
