@@ -154,12 +154,11 @@ export function useRewards(
   const validDates = data.datesUnderLimit.filter((d) => !resetDays.includes(d));
   const todayUnderLimit = validDates.includes(today);
   const { current, longest } = useMemo(
-    () => calcStreak(data.datesUnderLimit),
-    [data.datesUnderLimit]
+    () => calcStreak(validDates),
+    [validDates]
   );
 
-  // Stars = 1 per 5 days under limit
-  const totalStars = Math.floor(data.datesUnderLimit.length / 5);
+  const totalStars = Math.floor(validDates.length / 5);
 
   const rewards: RewardsData = {
     currentStreak: current,
