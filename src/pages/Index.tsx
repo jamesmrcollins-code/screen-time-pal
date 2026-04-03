@@ -298,12 +298,7 @@ const Index = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                onClick={() => {
-                  if (!pinRequired) {
-                    reset();
-                    resetSent();
-                  }
-                }}
+                onClick={handleResetAttempt}
                 className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
                 disabled={pinRequired}
               >
