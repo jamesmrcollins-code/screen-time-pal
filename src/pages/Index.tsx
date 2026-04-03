@@ -95,6 +95,8 @@ const Index = () => {
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
 
   const pinRequired = hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
