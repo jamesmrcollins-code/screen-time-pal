@@ -1,27 +1,17 @@
 import { useState, useCallback, useEffect } from "react";
 
-export interface DaySchedule {
-  enabled: boolean;
-  limitSeconds: number;
-}
-
 export interface ScheduleSettings {
   useSchedule: boolean;
-  days: Record<string, DaySchedule>; // mon, tue, wed, thu, fri, sat, sun
+  weekdayLimitSeconds: number;
+  weekendLimitSeconds: number;
 }
 
 const SCHEDULE_KEY = "screen-timer-schedule";
-const DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-const DAY_LABELS: Record<string, string> = {
-  mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday",
-  fri: "Friday", sat: "Saturday", sun: "Sunday",
-};
 
 const defaultSchedule: ScheduleSettings = {
   useSchedule: false,
-  days: Object.fromEntries(
-    DAY_NAMES.map((d) => [d, { enabled: true, limitSeconds: 3600 }])
-  ),
+  weekdayLimitSeconds: 3600,
+  weekendLimitSeconds: 7200,
 };
 
 function load(profileId: string | null): ScheduleSettings {
@@ -39,9 +29,14 @@ function save(settings: ScheduleSettings, profileId: string | null) {
   localStorage.setItem(key, JSON.stringify(settings));
 }
 
-function getCurrentDayKey(): string {
-  const jsDay = new Date().getDay(); // 0=Sun
-  return DAY_NAMES[jsDay === 0 ? 6 : jsDay - 1];
+function isWeekend(): boolean {
+  const day = new Date().getDay();
+  return day === 0 || day === 6;
+}
+
+export function isWeekendDate(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 6;
 }
 
 export function useSchedule(profileId: string | null = null) {
@@ -54,26 +49,14 @@ export function useSchedule(profileId: string | null = null) {
     setSettings((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const updateDay = useCallback((day: string, partial: Partial<DaySchedule>) => {
-    setSettings((prev) => ({
-      ...prev,
-      days: { ...prev.days, [day]: { ...prev.days[day], ...partial } },
-    }));
-  }, []);
-
   const getTodayLimit = useCallback((): number | null => {
     if (!settings.useSchedule) return null;
-    const today = getCurrentDayKey();
-    const daySettings = settings.days[today];
-    if (!daySettings?.enabled) return null;
-    return daySettings.limitSeconds;
+    return isWeekend() ? settings.weekendLimitSeconds : settings.weekdayLimitSeconds;
   }, [settings]);
 
-  const setFromCloud = useCallback((cloudData: { useSchedule: boolean; days: Record<string, any> }) => {
-    setSettings({ useSchedule: cloudData.useSchedule, days: cloudData.days as ScheduleSettings["days"] });
+  const setFromCloud = useCallback((cloudData: ScheduleSettings) => {
+    setSettings({ ...defaultSchedule, ...cloudData });
   }, []);
 
-  return { settings, update, updateDay, getTodayLimit, DAY_NAMES, DAY_LABELS, setScheduleFromCloud: setFromCloud };
+  return { settings, update, getTodayLimit, setScheduleFromCloud: setFromCloud };
 }
-
-export { DAY_NAMES, DAY_LABELS };
