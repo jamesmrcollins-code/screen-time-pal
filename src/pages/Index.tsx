@@ -435,7 +435,6 @@ const Index = () => {
                 <ScheduleSettingsUI
                   settings={scheduleSettings}
                   onUpdate={updateSchedule}
-                  onUpdateDay={updateDay}
                 />
               </div>
 

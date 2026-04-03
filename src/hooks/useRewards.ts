@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { format, subDays } from "date-fns";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 import type { ScheduleSettings } from "@/hooks/useSchedule";
+import { isWeekendDate } from "@/hooks/useSchedule";
 
 export interface RewardsData {
   currentStreak: number;
