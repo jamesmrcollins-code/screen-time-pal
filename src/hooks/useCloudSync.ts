@@ -87,9 +87,11 @@ export function useCloudSync(
           .maybeSingle();
 
         if (cloudSchedule) {
+          const days = cloudSchedule.days as Record<string, any>;
           setScheduleFromCloud({
             useSchedule: cloudSchedule.use_schedule,
-            days: cloudSchedule.days as Record<string, any>,
+            weekdayLimitSeconds: days?.weekdayLimitSeconds ?? 3600,
+            weekendLimitSeconds: days?.weekendLimitSeconds ?? 7200,
           });
         }
       } catch (err) {
