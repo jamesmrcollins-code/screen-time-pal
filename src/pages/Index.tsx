@@ -440,6 +440,12 @@ const Index = () => {
                 <ScheduleSettingsUI
                   settings={scheduleSettings}
                   onUpdate={updateSchedule}
+                  profiles={profiles}
+                  selectedProfileId={scheduleProfileId}
+                  onSelectProfile={(id) => {
+                    setScheduleProfileId(id);
+                    setFocusedProfileId(id);
+                  }}
                 />
               </div>
 
