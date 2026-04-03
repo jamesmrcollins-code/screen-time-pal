@@ -103,7 +103,11 @@ const Index = () => {
     if (!hasProfile(weeklyLimitProfileId)) {
       setWeeklyLimitProfileId(fallbackProfileId);
     }
-  }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId]);
+
+    if (!hasProfile(scheduleProfileId)) {
+      setScheduleProfileId(fallbackProfileId);
+    }
+  }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId, scheduleProfileId]);
 
   useEffect(() => {
     const limit = getTodayLimit();
