@@ -94,7 +94,7 @@ export const ScheduleSettings: React.FC<Props> = ({ settings, onUpdate, profiles
       )}
 
       <div className="flex items-center justify-between">
-        <Label htmlFor="schedule-toggle" className="text-sm text-foreground">Use daily schedule</Label>
+        <Label htmlFor="schedule-toggle" className="text-sm text-foreground">Use weekly schedule</Label>
         <Switch
           id="schedule-toggle"
           checked={settings.useSchedule}
