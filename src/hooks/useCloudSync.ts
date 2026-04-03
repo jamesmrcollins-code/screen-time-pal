@@ -155,7 +155,10 @@ export function useCloudSync(
       {
         user_id: user.id,
         use_schedule: scheduleData.useSchedule,
-        days: scheduleData.days,
+        days: {
+          weekdayLimitSeconds: scheduleData.weekdayLimitSeconds,
+          weekendLimitSeconds: scheduleData.weekendLimitSeconds,
+        },
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }
