@@ -84,6 +84,7 @@ const Index = () => {
   const [focusedProfileId, setFocusedProfileId] = useState<string | null>(null);
   const [dailyLimitProfileId, setDailyLimitProfileId] = useState<string | null>(activeId ?? profiles[0]?.id ?? null);
   const [weeklyLimitProfileId, setWeeklyLimitProfileId] = useState<string | null>(activeId ?? profiles[0]?.id ?? null);
+  const [scheduleProfileId, setScheduleProfileId] = useState<string | null>(activeId ?? profiles[0]?.id ?? null);
   const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
