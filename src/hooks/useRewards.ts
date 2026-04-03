@@ -150,7 +150,9 @@ export function useRewards(
   }, [data, profileId]);
 
   const today = format(new Date(), "yyyy-MM-dd");
-  const todayUnderLimit = data.datesUnderLimit.includes(today);
+  const resetDays = getResetDays();
+  const validDates = data.datesUnderLimit.filter((d) => !resetDays.includes(d));
+  const todayUnderLimit = validDates.includes(today);
   const { current, longest } = useMemo(
     () => calcStreak(data.datesUnderLimit),
     [data.datesUnderLimit]
