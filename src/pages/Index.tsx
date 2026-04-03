@@ -52,7 +52,7 @@ const Index = () => {
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
-  const { settings: scheduleSettings, update: updateSchedule, updateDay, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
+  const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
