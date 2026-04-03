@@ -36,10 +36,6 @@ function save(data: StoredRewards, profileId: string | null) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-function getDayKey(date: Date): string {
-  const jsDay = date.getDay(); // 0=Sun
-  return DAY_NAMES[jsDay === 0 ? 6 : jsDay - 1];
-}
 
 /**
  * Check unchecked past days and mark them as under-limit or not.
