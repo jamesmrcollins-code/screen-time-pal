@@ -31,6 +31,7 @@ import { ReferFriend } from "@/components/ReferFriend";
 
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
+  const [scheduleProfileId, setScheduleProfileId] = useState<string | null>(activeId ?? null);
 
   const {
     profileTimerInfos,
@@ -52,7 +53,7 @@ const Index = () => {
   const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
   const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
-  const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(activeId);
+  const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(scheduleProfileId ?? activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
   const { settings: lockSettings, update: updateLockSettings } = useLockScreenSettings();
   const { startAlarm, stopAlarm } = useAlarm();
@@ -102,7 +103,11 @@ const Index = () => {
     if (!hasProfile(weeklyLimitProfileId)) {
       setWeeklyLimitProfileId(fallbackProfileId);
     }
-  }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId]);
+
+    if (!hasProfile(scheduleProfileId)) {
+      setScheduleProfileId(fallbackProfileId);
+    }
+  }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId, scheduleProfileId]);
 
   useEffect(() => {
     const limit = getTodayLimit();
@@ -435,6 +440,12 @@ const Index = () => {
                 <ScheduleSettingsUI
                   settings={scheduleSettings}
                   onUpdate={updateSchedule}
+                  profiles={profiles}
+                  selectedProfileId={scheduleProfileId}
+                  onSelectProfile={(id) => {
+                    setScheduleProfileId(id);
+                    setFocusedProfileId(id);
+                  }}
                 />
               </div>
 
