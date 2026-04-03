@@ -149,11 +149,29 @@ const Index = () => {
   useEffect(() => {
     if (isFinished && !lockAlarmTriggeredRef.current) {
       lockAlarmTriggeredRef.current = true;
+      setHasHitZeroToday(true);
       if (lockSettings.lockOnZero && hasPin()) setIsScreenLocked(true);
       if (lockSettings.alarmOnZero) startAlarm();
     }
     if (!isFinished) lockAlarmTriggeredRef.current = false;
   }, [isFinished, lockSettings, hasPin, startAlarm]);
+
+  const handleResetAttempt = useCallback(() => {
+    if (pinRequired) return;
+    if (hasHitZeroToday) {
+      setShowResetConfirm(true);
+    } else {
+      reset();
+      resetSent();
+    }
+  }, [pinRequired, hasHitZeroToday, reset, resetSent]);
+
+  const handleConfirmReset = useCallback(() => {
+    markResetDay();
+    reset();
+    resetSent();
+    setShowResetConfirm(false);
+  }, [reset, resetSent]);
 
   const handleLockScreenUnlock = () => {
     setIsScreenLocked(false);
