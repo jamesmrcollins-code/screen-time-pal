@@ -12,7 +12,7 @@ export interface RewardsData {
 }
 
 const REWARDS_KEY = "screen-timer-rewards";
-const DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
 
 interface StoredRewards {
   datesUnderLimit: string[]; // YYYY-MM-DD
