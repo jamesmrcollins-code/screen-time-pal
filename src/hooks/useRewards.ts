@@ -3,6 +3,7 @@ import { format, subDays } from "date-fns";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 import type { ScheduleSettings } from "@/hooks/useSchedule";
 import { isWeekendDate } from "@/hooks/useSchedule";
+import { getResetDays } from "@/hooks/useResetDays";
 
 export interface RewardsData {
   currentStreak: number;
