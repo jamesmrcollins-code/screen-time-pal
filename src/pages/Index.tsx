@@ -1,5 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
 import { NotificationSettings } from "@/components/NotificationSettings";
@@ -28,6 +33,7 @@ import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
 import { ReferFriend } from "@/components/ReferFriend";
+import { markResetDay } from "@/hooks/useResetDays";
 
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
@@ -89,6 +95,8 @@ const Index = () => {
   const [notifEnabled, setNotifEnabled] = useState(
     "Notification" in window && Notification.permission === "granted"
   );
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
 
   const pinRequired = hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
@@ -141,11 +149,29 @@ const Index = () => {
   useEffect(() => {
     if (isFinished && !lockAlarmTriggeredRef.current) {
       lockAlarmTriggeredRef.current = true;
+      setHasHitZeroToday(true);
       if (lockSettings.lockOnZero && hasPin()) setIsScreenLocked(true);
       if (lockSettings.alarmOnZero) startAlarm();
     }
     if (!isFinished) lockAlarmTriggeredRef.current = false;
   }, [isFinished, lockSettings, hasPin, startAlarm]);
+
+  const handleResetAttempt = useCallback(() => {
+    if (pinRequired) return;
+    if (hasHitZeroToday) {
+      setShowResetConfirm(true);
+    } else {
+      reset();
+      resetSent();
+    }
+  }, [pinRequired, hasHitZeroToday, reset, resetSent]);
+
+  const handleConfirmReset = useCallback(() => {
+    markResetDay();
+    reset();
+    resetSent();
+    setShowResetConfirm(false);
+  }, [reset, resetSent]);
 
   const handleLockScreenUnlock = () => {
     setIsScreenLocked(false);
@@ -272,12 +298,7 @@ const Index = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                onClick={() => {
-                  if (!pinRequired) {
-                    reset();
-                    resetSent();
-                  }
-                }}
+                onClick={handleResetAttempt}
                 className={`rounded-full h-12 w-12 ${pinRequired ? "opacity-50" : ""}`}
                 disabled={pinRequired}
               >
@@ -290,12 +311,7 @@ const Index = () => {
               <Button
                 variant="danger"
                 size="lg"
-                onClick={() => {
-                  if (!pinRequired) {
-                    reset();
-                    resetSent();
-                  }
-                }}
+                onClick={handleResetAttempt}
                 className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
                 disabled={pinRequired}
               >
@@ -473,6 +489,23 @@ const Index = () => {
           )}
         </main>
       </div>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset timer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You've already used all your screen time today. Resetting now means today won't count toward your streak.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmReset}>
+              Reset anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
