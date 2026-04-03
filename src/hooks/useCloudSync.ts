@@ -23,9 +23,10 @@ export function useCloudSync(
   setThemeFromCloud: (data: { unlockedIds: string[]; activeThemeId: string }) => void,
   scheduleData: {
     useSchedule: boolean;
-    days: Record<string, any>;
+    weekdayLimitSeconds: number;
+    weekendLimitSeconds: number;
   },
-  setScheduleFromCloud: (data: { useSchedule: boolean; days: Record<string, any> }) => void
+  setScheduleFromCloud: (data: { useSchedule: boolean; weekdayLimitSeconds: number; weekendLimitSeconds: number }) => void
 ) {
   const { user } = useAuth();
   const hasSynced = useRef(false);
