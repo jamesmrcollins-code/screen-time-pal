@@ -23,9 +23,10 @@ export function useCloudSync(
   setThemeFromCloud: (data: { unlockedIds: string[]; activeThemeId: string }) => void,
   scheduleData: {
     useSchedule: boolean;
-    days: Record<string, any>;
+    weekdayLimitSeconds: number;
+    weekendLimitSeconds: number;
   },
-  setScheduleFromCloud: (data: { useSchedule: boolean; days: Record<string, any> }) => void
+  setScheduleFromCloud: (data: { useSchedule: boolean; weekdayLimitSeconds: number; weekendLimitSeconds: number }) => void
 ) {
   const { user } = useAuth();
   const hasSynced = useRef(false);
@@ -86,9 +87,11 @@ export function useCloudSync(
           .maybeSingle();
 
         if (cloudSchedule) {
+          const days = cloudSchedule.days as Record<string, any>;
           setScheduleFromCloud({
             useSchedule: cloudSchedule.use_schedule,
-            days: cloudSchedule.days as Record<string, any>,
+            weekdayLimitSeconds: days?.weekdayLimitSeconds ?? 3600,
+            weekendLimitSeconds: days?.weekendLimitSeconds ?? 7200,
           });
         }
       } catch (err) {
@@ -152,7 +155,10 @@ export function useCloudSync(
       {
         user_id: user.id,
         use_schedule: scheduleData.useSchedule,
-        days: scheduleData.days,
+        days: {
+          weekdayLimitSeconds: scheduleData.weekdayLimitSeconds,
+          weekendLimitSeconds: scheduleData.weekendLimitSeconds,
+        },
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }

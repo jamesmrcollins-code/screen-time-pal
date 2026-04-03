@@ -108,9 +108,8 @@ vi.mock("@/hooks/useRewards", () => ({
 
 vi.mock("@/hooks/useSchedule", () => ({
   useSchedule: () => ({
-    settings: { useSchedule: true, days: {} },
+    settings: { useSchedule: true, weekdayLimitSeconds: 3600, weekendLimitSeconds: 7200 },
     update: vi.fn(),
-    updateDay: vi.fn(),
     getTodayLimit: () => 1800,
     setScheduleFromCloud: vi.fn(),
   }),

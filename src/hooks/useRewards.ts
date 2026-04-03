@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { format, subDays } from "date-fns";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 import type { ScheduleSettings } from "@/hooks/useSchedule";
+import { isWeekendDate } from "@/hooks/useSchedule";
 
 export interface RewardsData {
   currentStreak: number;
@@ -11,7 +12,7 @@ export interface RewardsData {
 }
 
 const REWARDS_KEY = "screen-timer-rewards";
-const DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
 
 interface StoredRewards {
   datesUnderLimit: string[]; // YYYY-MM-DD
@@ -35,10 +36,6 @@ function save(data: StoredRewards, profileId: string | null) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-function getDayKey(date: Date): string {
-  const jsDay = date.getDay(); // 0=Sun
-  return DAY_NAMES[jsDay === 0 ? 6 : jsDay - 1];
-}
 
 /**
  * Check unchecked past days and mark them as under-limit or not.
@@ -65,19 +62,16 @@ function evaluatePastDays(
     if (newDatesUnderLimit.includes(dateStr)) continue;
     if (lastChecked && dateStr <= lastChecked) break;
 
-    const dayKey = getDayKey(d);
-    const daySchedule = schedule.days[dayKey];
-
-    if (!schedule.useSchedule || !daySchedule?.enabled) {
+    if (!schedule.useSchedule) {
       // Free day — auto-pass
       newDatesUnderLimit.push(dateStr);
     } else {
-      // Check usage against limit
+      const weekend = isWeekendDate(d);
+      const limit = weekend ? schedule.weekendLimitSeconds : schedule.weekdayLimitSeconds;
       const used = usageMap.get(dateStr) ?? 0;
-      if (used <= daySchedule.limitSeconds) {
+      if (used <= limit) {
         newDatesUnderLimit.push(dateStr);
       }
-      // If over limit, don't add — streak will break naturally
     }
   }
 
