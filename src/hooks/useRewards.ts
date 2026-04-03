@@ -65,19 +65,16 @@ function evaluatePastDays(
     if (newDatesUnderLimit.includes(dateStr)) continue;
     if (lastChecked && dateStr <= lastChecked) break;
 
-    const dayKey = getDayKey(d);
-    const daySchedule = schedule.days[dayKey];
-
-    if (!schedule.useSchedule || !daySchedule?.enabled) {
+    if (!schedule.useSchedule) {
       // Free day — auto-pass
       newDatesUnderLimit.push(dateStr);
     } else {
-      // Check usage against limit
+      const weekend = isWeekendDate(d);
+      const limit = weekend ? schedule.weekendLimitSeconds : schedule.weekdayLimitSeconds;
       const used = usageMap.get(dateStr) ?? 0;
-      if (used <= daySchedule.limitSeconds) {
+      if (used <= limit) {
         newDatesUnderLimit.push(dateStr);
       }
-      // If over limit, don't add — streak will break naturally
     }
   }
 
