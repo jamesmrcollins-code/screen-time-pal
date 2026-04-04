@@ -186,6 +186,9 @@ const Stats = () => {
           </div>
         </div>
 
+        {/* Weekly digest */}
+        <WeeklyDigest />
+
         {/* Daily breakdown */}
         <div className="bg-card border border-border rounded-2xl p-5">
           <h2 className="text-sm font-bold text-foreground mb-3">Daily Breakdown</h2>
