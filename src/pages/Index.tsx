@@ -33,6 +33,7 @@ import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
 import { ReferFriend } from "@/components/ReferFriend";
+import { EarnExtraTime } from "@/components/EarnExtraTime";
 import { markResetDay } from "@/hooks/useResetDays";
 
 const Index = () => {
