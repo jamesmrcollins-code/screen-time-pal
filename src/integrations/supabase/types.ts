@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      bonus_completions: {
+        Row: {
+          approved: boolean
+          completed_date: string
+          created_at: string
+          id: string
+          profile_id: string | null
+          task_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean
+          completed_date: string
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          task_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved?: boolean
+          completed_date?: string
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          task_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonus_completions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "bonus_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bonus_tasks: {
+        Row: {
+          bonus_minutes: number
+          created_at: string
+          id: string
+          profile_id: string | null
+          task_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bonus_minutes?: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          task_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bonus_minutes?: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          task_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       family_invites: {
         Row: {
           created_at: string
