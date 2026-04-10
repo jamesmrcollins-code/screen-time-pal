@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useUsageLog } from "@/hooks/useUsageLog";
@@ -9,23 +9,35 @@ const PRESET_MINUTES = [5, 10, 15, 30, 45, 60];
 
 export function AdjustTime() {
   const { profiles } = useProfiles();
-  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-    profiles[0]?.id ?? null
-  );
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
   const [minutes, setMinutes] = useState(15);
   const { addUsage } = useUsageLog(selectedProfileId);
 
-  const selectedProfile = profiles.find((p) => p.id === selectedProfileId);
+  const hasChildProfiles = profiles.length > 0;
+  const selectedProfile = useMemo(
+    () => profiles.find((p) => p.id === selectedProfileId) ?? null,
+    [profiles, selectedProfileId]
+  );
+
+  useEffect(() => {
+    if (!hasChildProfiles) {
+      setSelectedProfileId(null);
+      return;
+    }
+
+    if (!selectedProfileId || !profiles.some((profile) => profile.id === selectedProfileId)) {
+      setSelectedProfileId(profiles[0].id);
+    }
+  }, [hasChildProfiles, profiles, selectedProfileId]);
 
   const handleDeduct = () => {
-    if (!selectedProfileId) return;
     addUsage(minutes * 60);
     toast.success(
-      `Deducted ${minutes} min from ${selectedProfile?.avatar ?? ""} ${selectedProfile?.name ?? "profile"}'s time today`
+      hasChildProfiles
+        ? `Deducted ${minutes} min from ${selectedProfile?.avatar ?? ""} ${selectedProfile?.name ?? "profile"}'s time today`
+        : `Deducted ${minutes} min from today's default time`
     );
   };
-
-  if (profiles.length === 0) return null;
 
   return (
     <div>
@@ -35,6 +47,12 @@ export function AdjustTime() {
       <p className="text-xs text-muted-foreground mb-3">
         Deduct time if a child used screen time elsewhere (e.g. TV, tablet).
       </p>
+
+      {!hasChildProfiles && (
+        <p className="text-[11px] text-muted-foreground mb-3">
+          No child profile selected yet — this will adjust the default timer for today.
+        </p>
+      )}
 
       {profiles.length > 1 && (
         <div className="flex gap-2 flex-wrap mb-3">
@@ -96,7 +114,9 @@ export function AdjustTime() {
       </div>
 
       <Button onClick={handleDeduct} variant="default" className="w-full rounded-xl">
-        Deduct {minutes} min from {selectedProfile?.avatar} {selectedProfile?.name}
+        {hasChildProfiles
+          ? `Deduct ${minutes} min from ${selectedProfile?.avatar} ${selectedProfile?.name}`
+          : `Deduct ${minutes} min from default time`}
       </Button>
     </div>
   );
