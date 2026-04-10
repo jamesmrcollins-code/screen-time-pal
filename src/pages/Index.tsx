@@ -482,6 +482,10 @@ const Index = () => {
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />
               </div>
+
+              <div className="border-t border-border pt-5">
+                <AdjustTime />
+              </div>
             </div>
           )}
 
