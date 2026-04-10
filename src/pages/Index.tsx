@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
 import { ReferFriend } from "@/components/ReferFriend";
 import { EarnExtraTime } from "@/components/EarnExtraTime";
+import { AdjustTime } from "@/components/AdjustTime";
 import { markResetDay } from "@/hooks/useResetDays";
 
 const Index = () => {
@@ -480,6 +481,10 @@ const Index = () => {
 
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />
+              </div>
+
+              <div className="border-t border-border pt-5">
+                <AdjustTime />
               </div>
             </div>
           )}
