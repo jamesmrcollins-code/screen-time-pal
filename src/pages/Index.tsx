@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
-import { NotificationSettings } from "@/components/NotificationSettings";
+
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
 import { RewardsBadge } from "@/components/RewardsBadge";
@@ -20,8 +20,6 @@ import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingD
 import { ActiveUsersSelector } from "@/components/ActiveUsersSelector";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
-import { useNotificationSettings } from "@/hooks/useNotificationSettings";
-import { useSmsNotifier } from "@/hooks/useSmsNotifier";
 import { usePinLock } from "@/hooks/usePinLock";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
@@ -58,8 +56,6 @@ const Index = () => {
   } = useScreenTimer(activeIds);
 
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
-  const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
-  const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(scheduleProfileId ?? activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
@@ -139,13 +135,6 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
-  useEffect(() => {
-    if (isRunning) checkSms(remainingSeconds);
-  }, [remainingSeconds, isRunning, checkSms]);
-
-  useEffect(() => {
-    if (isFinished) checkSms(0);
-  }, [isFinished, checkSms]);
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
@@ -164,16 +153,14 @@ const Index = () => {
       setShowResetConfirm(true);
     } else {
       reset();
-      resetSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset, resetSent]);
+  }, [pinRequired, hasHitZeroToday, reset]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
     reset();
-    resetSent();
     setShowResetConfirm(false);
-  }, [reset, resetSent]);
+  }, [reset]);
 
   const handleLockScreenUnlock = () => {
     setIsScreenLocked(false);
@@ -475,9 +462,6 @@ const Index = () => {
                 />
               </div>
 
-              <div className="border-t border-border pt-5">
-                <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
-              </div>
 
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />

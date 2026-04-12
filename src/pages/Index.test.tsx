@@ -79,13 +79,6 @@ vi.mock("@/hooks/useUsageLog", () => ({
   useUsageLog: () => ({ log: [], addUsage: vi.fn(), setLogBulk: vi.fn() }),
 }));
 
-vi.mock("@/hooks/useNotificationSettings", () => ({
-  useNotificationSettings: () => ({ settings: {}, update: vi.fn() }),
-}));
-
-vi.mock("@/hooks/useSmsNotifier", () => ({
-  useSmsNotifier: () => ({ check: vi.fn(), resetSent: vi.fn() }),
-}));
 
 vi.mock("@/hooks/usePinLock", () => ({
   usePinLock: () => ({
@@ -153,7 +146,7 @@ vi.mock("@/components/TimeSetter", () => ({
 }));
 
 vi.mock("@/components/SwipeableTimerDisplay", () => ({ SwipeableTimerDisplay: () => <div /> }));
-vi.mock("@/components/NotificationSettings", () => ({ NotificationSettings: () => <div /> }));
+
 vi.mock("@/components/ProfileSelector", () => ({ ProfileSelector: () => <div /> }));
 vi.mock("@/components/PinLock", () => ({ PinLock: () => <div /> }));
 vi.mock("@/components/RewardsBadge", () => ({ RewardsBadge: () => <div /> }));
