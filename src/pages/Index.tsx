@@ -20,8 +20,6 @@ import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingD
 import { ActiveUsersSelector } from "@/components/ActiveUsersSelector";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
-import { useNotificationSettings } from "@/hooks/useNotificationSettings";
-import { useSmsNotifier } from "@/hooks/useSmsNotifier";
 import { usePinLock } from "@/hooks/usePinLock";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
@@ -58,8 +56,6 @@ const Index = () => {
   } = useScreenTimer(activeIds);
 
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
-  const { settings: notifSettings, update: updateNotifSettings } = useNotificationSettings();
-  const { check: checkSms, resetSent } = useSmsNotifier(notifSettings);
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(scheduleProfileId ?? activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
@@ -475,9 +471,6 @@ const Index = () => {
                 />
               </div>
 
-              <div className="border-t border-border pt-5">
-                <NotificationSettings settings={notifSettings} onUpdate={updateNotifSettings} />
-              </div>
 
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />
