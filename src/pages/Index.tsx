@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
+import { PushNotificationSettings } from "@/components/PushNotificationSettings";
 
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
@@ -20,6 +21,7 @@ import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingD
 import { ActiveUsersSelector } from "@/components/ActiveUsersSelector";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
+import { usePushNotifier } from "@/hooks/usePushNotifier";
 import { usePinLock } from "@/hooks/usePinLock";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
@@ -56,6 +58,7 @@ const Index = () => {
   } = useScreenTimer(activeIds);
 
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
+  const { settings: pushSettings, updateSettings: updatePushSettings, check: checkPush, resetSent: resetPushSent } = usePushNotifier();
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(scheduleProfileId ?? activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
@@ -135,6 +138,14 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
+  useEffect(() => {
+    if (isRunning) checkPush(remainingSeconds);
+  }, [remainingSeconds, isRunning, checkPush]);
+
+  useEffect(() => {
+    if (isFinished) checkPush(0);
+  }, [isFinished, checkPush]);
+
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
@@ -153,12 +164,14 @@ const Index = () => {
       setShowResetConfirm(true);
     } else {
       reset();
+      resetPushSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset]);
+  }, [pinRequired, hasHitZeroToday, reset, resetPushSent]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
     reset();
+    resetPushSent();
     setShowResetConfirm(false);
   }, [reset]);
 
@@ -462,6 +475,13 @@ const Index = () => {
                 />
               </div>
 
+              <div className="border-t border-border pt-5">
+                <PushNotificationSettings
+                  enabled={notifEnabled}
+                  settings={pushSettings}
+                  onUpdate={updatePushSettings}
+                />
+              </div>
 
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />

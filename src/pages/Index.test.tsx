@@ -79,6 +79,10 @@ vi.mock("@/hooks/useUsageLog", () => ({
   useUsageLog: () => ({ log: [], addUsage: vi.fn(), setLogBulk: vi.fn() }),
 }));
 
+vi.mock("@/hooks/usePushNotifier", () => ({
+  usePushNotifier: () => ({ settings: {}, updateSettings: vi.fn(), check: vi.fn(), resetSent: vi.fn() }),
+}));
+vi.mock("@/components/PushNotificationSettings", () => ({ PushNotificationSettings: () => <div /> }));
 
 vi.mock("@/hooks/usePinLock", () => ({
   usePinLock: () => ({
