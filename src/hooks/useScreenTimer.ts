@@ -176,7 +176,7 @@ export function useScreenTimer(activeProfileIds: string[]) {
 
       if (anyFinished || nowMs >= saved.endTimestamp) {
         setIsFinished(true);
-        sendNotification();
+        // notification handled by usePushNotifier
       } else {
         endTimestampRef.current = saved.endTimestamp;
         runStartTimeRef.current = saved.runStartTime;
@@ -221,7 +221,7 @@ export function useScreenTimer(activeProfileIds: string[]) {
         setIsRunning(false);
         setIsFinished(true);
         endTimestampRef.current = null;
-        sendNotification();
+        // notification handled by usePushNotifier
       }
 
       return next;
