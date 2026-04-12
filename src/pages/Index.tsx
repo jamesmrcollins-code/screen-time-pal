@@ -58,6 +58,7 @@ const Index = () => {
   } = useScreenTimer(activeIds);
 
   const { log: usageLogData, addUsage, setLogBulk } = useUsageLog(activeId);
+  const { settings: pushSettings, updateSettings: updatePushSettings, check: checkPush, resetSent: resetPushSent } = usePushNotifier();
   const { hasPin, isUnlocked, setPin, removePin, verifyPin, lock } = usePinLock();
   const { settings: scheduleSettings, update: updateSchedule, getTodayLimit, setScheduleFromCloud } = useSchedule(scheduleProfileId ?? activeId);
   const { rewards, rewardsRaw, setRewardsFromCloud } = useRewards(activeId, usageLogData, scheduleSettings);
