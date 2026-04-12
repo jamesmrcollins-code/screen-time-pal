@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
-import { NotificationSettings } from "@/components/NotificationSettings";
+
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
 import { RewardsBadge } from "@/components/RewardsBadge";
