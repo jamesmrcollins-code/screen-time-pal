@@ -135,13 +135,6 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
-  useEffect(() => {
-    if (isRunning) checkSms(remainingSeconds);
-  }, [remainingSeconds, isRunning, checkSms]);
-
-  useEffect(() => {
-    if (isFinished) checkSms(0);
-  }, [isFinished, checkSms]);
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
@@ -160,16 +153,14 @@ const Index = () => {
       setShowResetConfirm(true);
     } else {
       reset();
-      resetSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset, resetSent]);
+  }, [pinRequired, hasHitZeroToday, reset]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
     reset();
-    resetSent();
     setShowResetConfirm(false);
-  }, [reset, resetSent]);
+  }, [reset]);
 
   const handleLockScreenUnlock = () => {
     setIsScreenLocked(false);
