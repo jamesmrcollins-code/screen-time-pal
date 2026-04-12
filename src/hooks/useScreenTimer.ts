@@ -62,14 +62,6 @@ function saveState(state: StoredState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function sendNotification() {
-  if ("Notification" in window && Notification.permission === "granted") {
-    new Notification("⏰ Screen Time's Up!", {
-      body: "The allocated screen time has been used up.",
-      icon: "/favicon.svg",
-    });
-  }
-}
 
 /** Ensure profile state has correct date keys, resetting if needed */
 function refreshProfileState(ps: ProfileTimerState): ProfileTimerState {
