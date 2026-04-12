@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
+import { PushNotificationSettings } from "@/components/PushNotificationSettings";
 
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
@@ -135,7 +136,7 @@ const Index = () => {
     }
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
-import { PushNotificationSettings } from "@/components/PushNotificationSettings";
+
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
