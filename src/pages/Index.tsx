@@ -138,6 +138,14 @@ const Index = () => {
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
 
+  useEffect(() => {
+    if (isRunning) checkPush(remainingSeconds);
+  }, [remainingSeconds, isRunning, checkPush]);
+
+  useEffect(() => {
+    if (isFinished) checkPush(0);
+  }, [isFinished, checkPush]);
+
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
@@ -156,12 +164,14 @@ const Index = () => {
       setShowResetConfirm(true);
     } else {
       reset();
+      resetPushSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset]);
+  }, [pinRequired, hasHitZeroToday, reset, resetPushSent]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
     reset();
+    resetPushSent();
     setShowResetConfirm(false);
   }, [reset]);
 
@@ -465,6 +475,13 @@ const Index = () => {
                 />
               </div>
 
+              <div className="border-t border-border pt-5">
+                <PushNotificationSettings
+                  enabled={notifEnabled}
+                  settings={pushSettings}
+                  onUpdate={updatePushSettings}
+                />
+              </div>
 
               <div className="border-t border-border pt-5">
                 <EarnExtraTime />
