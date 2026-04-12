@@ -20,6 +20,7 @@ import { OnboardingDialog, shouldShowOnboarding } from "@/components/OnboardingD
 import { ActiveUsersSelector } from "@/components/ActiveUsersSelector";
 import { useScreenTimer } from "@/hooks/useScreenTimer";
 import { useUsageLog } from "@/hooks/useUsageLog";
+import { usePushNotifier } from "@/hooks/usePushNotifier";
 import { usePinLock } from "@/hooks/usePinLock";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useRewards } from "@/hooks/useRewards";
@@ -134,7 +135,7 @@ const Index = () => {
     }
     prevRemaining.current = remainingSeconds;
   }, [remainingSeconds, isRunning, addUsage]);
-
+import { PushNotificationSettings } from "@/components/PushNotificationSettings";
 
   const lockAlarmTriggeredRef = useRef(false);
   useEffect(() => {
