@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useFamily } from "@/hooks/useFamily";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, UserPlus, Check, X, Mail, Loader2, Crown } from "lucide-react";
+import { Users, UserPlus, Check, X, Mail, Loader2, Crown, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const FamilySharing: React.FC = () => {
   const { user } = useAuth();
+  const { isPremium, loading: subLoading } = useSubscription();
+  const navigate = useNavigate();
   const {
     sentInvites,
     receivedInvites,
@@ -36,6 +40,32 @@ export const FamilySharing: React.FC = () => {
   };
 
   if (!user) return null;
+
+  // Locked state for non-premium users
+  if (!subLoading && !isPremium) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="w-5 h-5 text-muted-foreground" />
+          <h3 className="text-base font-bold text-foreground">Family Sharing</h3>
+          <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
+            <Lock className="w-3 h-3" /> Premium
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Invite your partner to share access to your children's screen time profiles and timers.
+        </p>
+        <Button
+          onClick={() => navigate("/pricing")}
+          className="w-full h-11 rounded-xl gap-2"
+        >
+          <Crown className="w-4 h-4" />
+          Upgrade to unlock
+        </Button>
+      </div>
+    );
+  }
+
 
   const pendingSent = sentInvites.filter((i) => i.status === "pending");
   const acceptedSent = sentInvites.filter((i) => i.status === "accepted");
