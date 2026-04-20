@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useFamily } from "@/hooks/useFamily";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, UserPlus, Check, X, Mail, Loader2, Crown } from "lucide-react";
+import { Users, UserPlus, Check, X, Mail, Loader2, Crown, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const FamilySharing: React.FC = () => {
   const { user } = useAuth();
+  const { isPremium, loading: subLoading } = useSubscription();
+  const navigate = useNavigate();
   const {
     sentInvites,
     receivedInvites,
