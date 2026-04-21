@@ -477,16 +477,21 @@ const Index = () => {
               </div>
 
               <div className="border-t border-border pt-5">
-                <ScheduleSettingsUI
-                  settings={scheduleSettings}
-                  onUpdate={updateSchedule}
-                  profiles={profiles}
-                  selectedProfileId={scheduleProfileId}
-                  onSelectProfile={(id) => {
-                    setScheduleProfileId(id);
-                    setFocusedProfileId(id);
-                  }}
-                />
+                <PremiumGate
+                  title="Custom Weekly Schedule"
+                  description="Set different screen time limits for weekdays vs weekends, per profile."
+                >
+                  <ScheduleSettingsUI
+                    settings={scheduleSettings}
+                    onUpdate={updateSchedule}
+                    profiles={profiles}
+                    selectedProfileId={scheduleProfileId}
+                    onSelectProfile={(id) => {
+                      setScheduleProfileId(id);
+                      setFocusedProfileId(id);
+                    }}
+                  />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
@@ -506,7 +511,12 @@ const Index = () => {
               </div>
 
               <div className="border-t border-border pt-5">
-                <EarnExtraTime />
+                <PremiumGate
+                  title="Earn Extra Time (Bonus Tasks)"
+                  description="Let kids earn bonus screen time by completing chores and tasks you approve."
+                >
+                  <EarnExtraTime />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
