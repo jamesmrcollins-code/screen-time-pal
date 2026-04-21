@@ -36,10 +36,13 @@ import { ReferFriend } from "@/components/ReferFriend";
 import { EarnExtraTime } from "@/components/EarnExtraTime";
 import { AdjustTime } from "@/components/AdjustTime";
 import { markResetDay } from "@/hooks/useResetDays";
+import { PremiumGate } from "@/components/PremiumGate";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
   const [scheduleProfileId, setScheduleProfileId] = useState<string | null>(activeId ?? null);
+  const { isPremium } = useSubscription();
 
   const {
     profileTimerInfos,
@@ -245,8 +248,17 @@ const Index = () => {
             <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground h-9 w-9">
               <Share2 className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground h-9 w-9">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => (isPremium ? setShowThemePicker(true) : navigate("/pricing"))}
+              className="text-muted-foreground h-9 w-9 relative"
+              title={isPremium ? "Theme store" : "Premium — Upgrade to unlock"}
+            >
               <Palette className="w-4 h-4" />
+              {!isPremium && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full" />
+              )}
             </Button>
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
@@ -356,23 +368,33 @@ const Index = () => {
 
           {showSettings && (
             <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6 animate-in fade-in slide-in-from-top-2">
-              <PinLock
-                hasPin={hasPin()}
-                isUnlocked={isUnlocked}
-                onVerify={verifyPin}
-                onSetPin={setPin}
-                onRemovePin={removePin}
-                onLock={lock}
-              />
+              <PremiumGate
+                title="Parent PIN Lock"
+                description="Lock settings and timer controls behind a PIN so kids can't change limits."
+              >
+                <PinLock
+                  hasPin={hasPin()}
+                  isUnlocked={isUnlocked}
+                  onVerify={verifyPin}
+                  onSetPin={setPin}
+                  onRemovePin={removePin}
+                  onLock={lock}
+                />
+              </PremiumGate>
 
               <div className="border-t border-border pt-5">
-                <ProfileSelector
-                  profiles={profiles}
-                  activeId={activeId}
-                  onSwitch={switchProfile}
-                  onAdd={addProfile}
-                  onRemove={removeProfile}
-                />
+                <PremiumGate
+                  title="Multiple Child Profiles"
+                  description="Create a separate profile for each child with their own timers, usage, and rewards."
+                >
+                  <ProfileSelector
+                    profiles={profiles}
+                    activeId={activeId}
+                    onSwitch={switchProfile}
+                    onAdd={addProfile}
+                    onRemove={removeProfile}
+                  />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
@@ -455,16 +477,21 @@ const Index = () => {
               </div>
 
               <div className="border-t border-border pt-5">
-                <ScheduleSettingsUI
-                  settings={scheduleSettings}
-                  onUpdate={updateSchedule}
-                  profiles={profiles}
-                  selectedProfileId={scheduleProfileId}
-                  onSelectProfile={(id) => {
-                    setScheduleProfileId(id);
-                    setFocusedProfileId(id);
-                  }}
-                />
+                <PremiumGate
+                  title="Custom Weekly Schedule"
+                  description="Set different screen time limits for weekdays vs weekends, per profile."
+                >
+                  <ScheduleSettingsUI
+                    settings={scheduleSettings}
+                    onUpdate={updateSchedule}
+                    profiles={profiles}
+                    selectedProfileId={scheduleProfileId}
+                    onSelectProfile={(id) => {
+                      setScheduleProfileId(id);
+                      setFocusedProfileId(id);
+                    }}
+                  />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
@@ -484,7 +511,12 @@ const Index = () => {
               </div>
 
               <div className="border-t border-border pt-5">
-                <EarnExtraTime />
+                <PremiumGate
+                  title="Earn Extra Time (Bonus Tasks)"
+                  description="Let kids earn bonus screen time by completing chores and tasks you approve."
+                >
+                  <EarnExtraTime />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">

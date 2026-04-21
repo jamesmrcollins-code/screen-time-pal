@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WeeklyDigest } from "@/components/WeeklyDigest";
+import { PremiumGate } from "@/components/PremiumGate";
 
 function formatDuration(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600);
@@ -166,6 +167,11 @@ const Stats = () => {
         </div>
 
         {/* 30-day trend line */}
+        <PremiumGate
+          title="30-Day Trend"
+          description="See long-term screen time trends over the last 30 days."
+          icon={<TrendingUp className="w-4 h-4 text-muted-foreground" />}
+        >
         <div className="bg-card border border-border rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
@@ -185,11 +191,21 @@ const Stats = () => {
             </ResponsiveContainer>
           </div>
         </div>
+        </PremiumGate>
 
         {/* Weekly digest */}
-        <WeeklyDigest />
+        <PremiumGate
+          title="Weekly Digest"
+          description="Get a weekly summary of your family's screen time progress and insights."
+        >
+          <WeeklyDigest />
+        </PremiumGate>
 
         {/* Daily breakdown */}
+        <PremiumGate
+          title="Daily Breakdown"
+          description="View a detailed daily log of screen time usage."
+        >
         <div className="bg-card border border-border rounded-2xl p-5">
           <h2 className="text-sm font-bold text-foreground mb-3">Daily Breakdown</h2>
           <div className="space-y-2">
@@ -201,6 +217,7 @@ const Stats = () => {
             ))}
           </div>
         </div>
+        </PremiumGate>
       </main>
     </div>
   );
