@@ -4,7 +4,7 @@ import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useProfiles } from "@/hooks/useProfiles";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line } from "recharts";
-import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp } from "lucide-react";
+import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
