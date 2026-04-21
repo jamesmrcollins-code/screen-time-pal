@@ -58,6 +58,21 @@ const Stats = () => {
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId);
 
+  const handleExportCSV = () => {
+    const rows = [["Date", "Seconds", "Hours"]];
+    monthData.forEach((d) => {
+      rows.push([d.fullDate, String(d.seconds), String(d.hours)]);
+    });
+    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `screen-time-${selectedProfile?.name ?? "all"}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center justify-between px-6 py-4">
