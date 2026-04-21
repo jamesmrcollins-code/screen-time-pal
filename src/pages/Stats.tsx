@@ -216,6 +216,23 @@ const Stats = () => {
           <WeeklyDigest />
         </PremiumGate>
 
+        {/* CSV export */}
+        <PremiumGate
+          title="Export Data (CSV)"
+          description="Download a CSV of the last 30 days of screen time data."
+          icon={<Download className="w-4 h-4 text-muted-foreground" />}
+        >
+          <div className="bg-card border border-border rounded-2xl p-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Export Data</h2>
+              <p className="text-xs text-muted-foreground">Download last 30 days as CSV.</p>
+            </div>
+            <Button onClick={handleExportCSV} size="sm" className="rounded-full gap-1.5">
+              <Download className="w-4 h-4" /> Export
+            </Button>
+          </div>
+        </PremiumGate>
+
         {/* Daily breakdown */}
         <PremiumGate
           title="Daily Breakdown"
