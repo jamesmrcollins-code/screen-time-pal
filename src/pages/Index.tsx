@@ -102,8 +102,32 @@ const Index = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
 
-  const pinRequired = hasPin() && !isUnlocked;
+  const pinRequired = isPremium && hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
+
+  // Enforce premium gating on underlying state. Non-premium users revert to free-tier behaviour
+  // even if data was created while premium or via direct localStorage.
+  useEffect(() => {
+    if (isPremium) return;
+    // Reset active theme to default if a premium theme is applied
+    if (activeThemeId !== "default") setActiveTheme("default");
+    // Disable custom schedule
+    if (scheduleSettings.useSchedule) updateSchedule({ useSchedule: false });
+    // Collapse to at most one active profile
+    if (activeIds.length > 1) switchProfile(activeIds[0] ?? null);
+    // Disable lock-on-zero (PIN-gated lock screen)
+    if (lockSettings.lockOnZero) updateLockSettings({ lockOnZero: false });
+  }, [
+    isPremium,
+    activeThemeId,
+    setActiveTheme,
+    scheduleSettings.useSchedule,
+    updateSchedule,
+    activeIds,
+    switchProfile,
+    lockSettings.lockOnZero,
+    updateLockSettings,
+  ]);
 
   useEffect(() => {
     const hasProfile = (id: string | null) => !!id && profiles.some((profile) => profile.id === id);
@@ -122,6 +146,7 @@ const Index = () => {
   }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId, scheduleProfileId]);
 
   useEffect(() => {
+    if (!isPremium) return; // Schedule is a premium feature
     const limit = getTodayLimit();
     if (limit === null || isRunning) return;
 
@@ -131,7 +156,7 @@ const Index = () => {
     }
 
     setDailyTime(limit);
-  }, [activeId, getTodayLimit, isRunning, setDailyTime]);
+  }, [isPremium, activeId, getTodayLimit, isRunning, setDailyTime]);
 
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
