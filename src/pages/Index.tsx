@@ -248,8 +248,17 @@ const Index = () => {
             <Button variant="ghost" size="icon" onClick={() => setShowReferFriend(true)} className="text-muted-foreground h-9 w-9">
               <Share2 className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setShowThemePicker(true)} className="text-muted-foreground h-9 w-9">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => (isPremium ? setShowThemePicker(true) : navigate("/pricing"))}
+              className="text-muted-foreground h-9 w-9 relative"
+              title={isPremium ? "Theme store" : "Premium — Upgrade to unlock"}
+            >
               <Palette className="w-4 h-4" />
+              {!isPremium && (
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full" />
+              )}
             </Button>
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
