@@ -115,8 +115,9 @@ const Index = () => {
     if (scheduleSettings.useSchedule) updateSchedule({ useSchedule: false });
     // Collapse to at most one active profile
     if (activeIds.length > 1) switchProfile(activeIds[0] ?? null);
-    // Disable lock-on-zero (PIN-gated lock screen)
+    // Disable premium lock-screen behaviours (lock-on-zero + alarm)
     if (lockSettings.lockOnZero) updateLockSettings({ lockOnZero: false });
+    if (lockSettings.alarmOnZero) updateLockSettings({ alarmOnZero: false });
   }, [
     isPremium,
     activeThemeId,
@@ -126,6 +127,7 @@ const Index = () => {
     activeIds,
     switchProfile,
     lockSettings.lockOnZero,
+    lockSettings.alarmOnZero,
     updateLockSettings,
   ]);
 
