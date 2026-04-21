@@ -42,6 +42,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
   const [scheduleProfileId, setScheduleProfileId] = useState<string | null>(activeId ?? null);
+  const { isPremium } = useSubscription();
 
   const {
     profileTimerInfos,
