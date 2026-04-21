@@ -368,23 +368,33 @@ const Index = () => {
 
           {showSettings && (
             <div className="w-full max-w-sm bg-card rounded-2xl p-6 shadow-lg border border-border space-y-6 animate-in fade-in slide-in-from-top-2">
-              <PinLock
-                hasPin={hasPin()}
-                isUnlocked={isUnlocked}
-                onVerify={verifyPin}
-                onSetPin={setPin}
-                onRemovePin={removePin}
-                onLock={lock}
-              />
+              <PremiumGate
+                title="Parent PIN Lock"
+                description="Lock settings and timer controls behind a PIN so kids can't change limits."
+              >
+                <PinLock
+                  hasPin={hasPin()}
+                  isUnlocked={isUnlocked}
+                  onVerify={verifyPin}
+                  onSetPin={setPin}
+                  onRemovePin={removePin}
+                  onLock={lock}
+                />
+              </PremiumGate>
 
               <div className="border-t border-border pt-5">
-                <ProfileSelector
-                  profiles={profiles}
-                  activeId={activeId}
-                  onSwitch={switchProfile}
-                  onAdd={addProfile}
-                  onRemove={removeProfile}
-                />
+                <PremiumGate
+                  title="Multiple Child Profiles"
+                  description="Create a separate profile for each child with their own timers, usage, and rewards."
+                >
+                  <ProfileSelector
+                    profiles={profiles}
+                    activeId={activeId}
+                    onSwitch={switchProfile}
+                    onAdd={addProfile}
+                    onRemove={removeProfile}
+                  />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
