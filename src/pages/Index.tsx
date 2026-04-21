@@ -36,6 +36,8 @@ import { ReferFriend } from "@/components/ReferFriend";
 import { EarnExtraTime } from "@/components/EarnExtraTime";
 import { AdjustTime } from "@/components/AdjustTime";
 import { markResetDay } from "@/hooks/useResetDays";
+import { PremiumGate } from "@/components/PremiumGate";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Index = () => {
   const { profiles, activeId, activeIds, addProfile, removeProfile, switchProfile, toggleActiveProfile } = useProfiles();
