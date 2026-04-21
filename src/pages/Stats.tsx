@@ -4,7 +4,7 @@ import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useProfiles } from "@/hooks/useProfiles";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line } from "recharts";
-import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp } from "lucide-react";
+import { Timer, ArrowLeft, Clock, Star, Flame, Trophy, TrendingUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -57,6 +57,21 @@ const Stats = () => {
   ];
 
   const selectedProfile = profiles.find((p) => p.id === selectedProfileId);
+
+  const handleExportCSV = () => {
+    const rows = [["Date", "Seconds", "Hours"]];
+    monthData.forEach((d) => {
+      rows.push([d.fullDate, String(d.seconds), String(d.hours)]);
+    });
+    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `screen-time-${selectedProfile?.name ?? "all"}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -199,6 +214,23 @@ const Stats = () => {
           description="Get a weekly summary of your family's screen time progress and insights."
         >
           <WeeklyDigest />
+        </PremiumGate>
+
+        {/* CSV export */}
+        <PremiumGate
+          title="Export Data (CSV)"
+          description="Download a CSV of the last 30 days of screen time data."
+          icon={<Download className="w-4 h-4 text-muted-foreground" />}
+        >
+          <div className="bg-card border border-border rounded-2xl p-5 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Export Data</h2>
+              <p className="text-xs text-muted-foreground">Download last 30 days as CSV.</p>
+            </div>
+            <Button onClick={handleExportCSV} size="sm" className="rounded-full gap-1.5">
+              <Download className="w-4 h-4" /> Export
+            </Button>
+          </div>
         </PremiumGate>
 
         {/* Daily breakdown */}

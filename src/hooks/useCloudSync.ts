@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import type { UsageEntry } from "@/hooks/useUsageLog";
 
 /**
@@ -29,12 +30,13 @@ export function useCloudSync(
   setScheduleFromCloud: (data: { useSchedule: boolean; weekdayLimitSeconds: number; weekendLimitSeconds: number }) => void
 ) {
   const { user } = useAuth();
+  const { isPremium } = useSubscription();
   const hasSynced = useRef(false);
   const prevUsageLength = useRef(usageLog.length);
 
   // Load from cloud on first auth
   useEffect(() => {
-    if (!user || hasSynced.current) return;
+    if (!user || !isPremium || hasSynced.current) return;
     hasSynced.current = true;
 
     const loadFromCloud = async () => {
@@ -100,7 +102,7 @@ export function useCloudSync(
     };
 
     loadFromCloud();
-  }, [user]);
+  }, [user, isPremium]);
 
   // Save usage to cloud on changes
   const saveUsageToCloud = useCallback(async () => {
@@ -120,11 +122,11 @@ export function useCloudSync(
 
   // Debounced save on usage changes
   useEffect(() => {
-    if (!user || usageLog.length === prevUsageLength.current) return;
+    if (!user || !isPremium || usageLog.length === prevUsageLength.current) return;
     prevUsageLength.current = usageLog.length;
     const t = setTimeout(saveUsageToCloud, 5000);
     return () => clearTimeout(t);
-  }, [usageLog, user, saveUsageToCloud]);
+  }, [usageLog, user, isPremium, saveUsageToCloud]);
 
   // Save rewards + theme to cloud
   const saveRewardsToCloud = useCallback(async () => {
@@ -143,10 +145,10 @@ export function useCloudSync(
   }, [user, rewardsData, themeData]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isPremium) return;
     const t = setTimeout(saveRewardsToCloud, 3000);
     return () => clearTimeout(t);
-  }, [rewardsData, themeData, user, saveRewardsToCloud]);
+  }, [rewardsData, themeData, user, isPremium, saveRewardsToCloud]);
 
   // Save schedule to cloud
   const saveScheduleToCloud = useCallback(async () => {
@@ -166,10 +168,10 @@ export function useCloudSync(
   }, [user, scheduleData]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isPremium) return;
     const t = setTimeout(saveScheduleToCloud, 3000);
     return () => clearTimeout(t);
-  }, [scheduleData, user, saveScheduleToCloud]);
+  }, [scheduleData, user, isPremium, saveScheduleToCloud]);
 }
 
 function mergeUsage(local: UsageEntry[], cloud: UsageEntry[]): UsageEntry[] {

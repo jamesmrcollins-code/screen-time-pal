@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, X, Users } from "lucide-react";
+import { UserPlus, X, Users, Crown } from "lucide-react";
 import type { ChildProfile } from "@/hooks/useProfiles";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   profiles: ChildProfile[];
@@ -17,6 +19,9 @@ export const ProfileSelector: React.FC<Props> = ({
 }) => {
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState("");
+  const { isPremium } = useSubscription();
+  const navigate = useNavigate();
+  const freeLimitReached = !isPremium && profiles.length >= 1;
 
   const handleAdd = () => {
     if (name.trim()) {
@@ -74,6 +79,15 @@ export const ProfileSelector: React.FC<Props> = ({
           />
           <Button size="sm" onClick={handleAdd} className="rounded-lg">Add</Button>
           <Button size="sm" variant="ghost" onClick={() => setShowAdd(false)} className="rounded-lg">✕</Button>
+        </div>
+      ) : freeLimitReached ? (
+        <div className="rounded-xl border border-border bg-secondary/40 p-3 space-y-2">
+          <p className="text-xs text-muted-foreground">
+            Free plan is limited to <span className="font-semibold text-foreground">1 child profile</span>. Upgrade to add unlimited profiles.
+          </p>
+          <Button size="sm" onClick={() => navigate("/pricing")} className="rounded-full gap-1.5 w-full">
+            <Crown className="w-3.5 h-3.5" /> Upgrade for unlimited profiles
+          </Button>
         </div>
       ) : (
         <Button variant="secondary" size="sm" onClick={() => setShowAdd(true)} className="rounded-full">
