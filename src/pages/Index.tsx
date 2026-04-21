@@ -102,13 +102,11 @@ const Index = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
 
-  const pinRequired = hasPin() && !isUnlocked;
+  const pinRequired = isPremium && hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
 
-  // Enforce premium gating on underlying state (in case data was created while premium
-  // or via direct localStorage). Non-premium users revert to free-tier behaviour.
-  const pinRequired_effective = isPremium ? pinRequired : false;
-
+  // Enforce premium gating on underlying state. Non-premium users revert to free-tier behaviour
+  // even if data was created while premium or via direct localStorage.
   useEffect(() => {
     if (isPremium) return;
     // Reset active theme to default if a premium theme is applied
