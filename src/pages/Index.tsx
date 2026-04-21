@@ -520,11 +520,16 @@ const Index = () => {
               </div>
 
               <div className="border-t border-border pt-5">
-                <LockScreenSettings
-                  settings={lockSettings}
-                  onUpdate={updateLockSettings}
-                  hasPinSet={hasPin()}
-                />
+                <PremiumGate
+                  title="Lock Screen Customization"
+                  description="Lock the screen when time's up, and enable the alarm sound + vibration."
+                >
+                  <LockScreenSettings
+                    settings={lockSettings}
+                    onUpdate={updateLockSettings}
+                    hasPinSet={hasPin()}
+                  />
+                </PremiumGate>
               </div>
 
               <div className="border-t border-border pt-5">
