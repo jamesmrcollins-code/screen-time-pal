@@ -146,6 +146,7 @@ const Index = () => {
   }, [profiles, focusedProfileId, activeId, fallbackProfileId, dailyLimitProfileId, weeklyLimitProfileId, scheduleProfileId]);
 
   useEffect(() => {
+    if (!isPremium) return; // Schedule is a premium feature
     const limit = getTodayLimit();
     if (limit === null || isRunning) return;
 
@@ -155,7 +156,7 @@ const Index = () => {
     }
 
     setDailyTime(limit);
-  }, [activeId, getTodayLimit, isRunning, setDailyTime]);
+  }, [isPremium, activeId, getTodayLimit, isRunning, setDailyTime]);
 
   const prevRemaining = useRef(remainingSeconds);
   useEffect(() => {
