@@ -109,8 +109,10 @@ const Index = () => {
   // even if data was created while premium or via direct localStorage.
   useEffect(() => {
     if (isPremium) return;
-    // Reset active theme to default if a premium theme is applied
-    if (activeThemeId !== "default") setActiveTheme("default");
+    // Reset active theme to default only if a premium-locked theme is applied.
+    // Free users can still earn star-unlocked themes.
+    const current = APP_THEMES.find((t) => t.id === activeThemeId);
+    if (current?.premium) setActiveTheme("default");
     // Disable custom schedule
     if (scheduleSettings.useSchedule) updateSchedule({ useSchedule: false });
     // Collapse to at most one active profile
