@@ -144,6 +144,7 @@ export const APP_THEMES: AppTheme[] = [
     name: "Midnight Gold",
     emoji: "✨",
     cost: 12,
+    premium: true,
     light: {
       "--background": "45 30% 96%",
       "--card": "45 25% 100%",
