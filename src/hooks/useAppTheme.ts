@@ -185,6 +185,7 @@ export const APP_THEMES: AppTheme[] = [
     name: "Bubblegum Pop",
     emoji: "🍬",
     cost: 15,
+    premium: true,
     light: {
       "--background": "330 35% 97%",
       "--card": "330 25% 100%",
