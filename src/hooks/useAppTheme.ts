@@ -5,6 +5,7 @@ export interface AppTheme {
   name: string;
   emoji: string;
   cost: number; // stars to unlock (0 = free/default)
+  premium?: boolean; // requires premium subscription in addition to stars
   light: Record<string, string>;
   dark: Record<string, string>;
 }
