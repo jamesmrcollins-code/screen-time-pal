@@ -28,7 +28,7 @@ import { useRewards } from "@/hooks/useRewards";
 import { useSchedule } from "@/hooks/useSchedule";
 import { useLockScreenSettings } from "@/hooks/useLockScreenSettings";
 import { useAlarm } from "@/hooks/useAlarm";
-import { useAppTheme } from "@/hooks/useAppTheme";
+import { useAppTheme, APP_THEMES } from "@/hooks/useAppTheme";
 import { useCloudSync } from "@/hooks/useCloudSync";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause, RotateCcw, Bell, Settings, Timer, BarChart3, UserCircle, Palette, Share2 } from "lucide-react";
@@ -278,14 +278,11 @@ const Index = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => (isPremium ? setShowThemePicker(true) : navigate("/pricing"))}
+              onClick={() => setShowThemePicker(true)}
               className="text-muted-foreground h-9 w-9 relative"
-              title={isPremium ? "Theme store" : "Premium — Upgrade to unlock"}
+              title="Theme store"
             >
               <Palette className="w-4 h-4" />
-              {!isPremium && (
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full" />
-              )}
             </Button>
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => navigate("/stats")} className="text-muted-foreground h-9 w-9">
@@ -308,6 +305,7 @@ const Index = () => {
           isUnlocked={isThemeUnlocked}
           unlockTheme={unlockTheme}
           setActiveTheme={setActiveTheme}
+          isPremium={isPremium}
         />
 
         <ReferFriend open={showReferFriend} onOpenChange={setShowReferFriend} />
