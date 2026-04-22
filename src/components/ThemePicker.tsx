@@ -1,5 +1,5 @@
 import React from "react";
-import { Lock, Check, Star } from "lucide-react";
+import { Lock, Check, Star, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { APP_THEMES } from "@/hooks/useAppTheme";
 import {
@@ -10,6 +10,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   open: boolean;
@@ -19,6 +20,7 @@ interface Props {
   isUnlocked: (id: string) => boolean;
   unlockTheme: (id: string) => boolean;
   setActiveTheme: (id: string) => void;
+  isPremium: boolean;
 }
 
 export const ThemePicker: React.FC<Props> = ({
@@ -29,10 +31,19 @@ export const ThemePicker: React.FC<Props> = ({
   isUnlocked,
   unlockTheme,
   setActiveTheme,
+  isPremium,
 }) => {
+  const navigate = useNavigate();
+
   const handleSelect = (themeId: string) => {
     const theme = APP_THEMES.find((t) => t.id === themeId);
     if (!theme) return;
+
+    if (theme.premium && !isPremium) {
+      onOpenChange(false);
+      navigate("/pricing");
+      return;
+    }
 
     if (isUnlocked(themeId)) {
       setActiveTheme(themeId);
