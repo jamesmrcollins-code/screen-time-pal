@@ -5,6 +5,7 @@ export interface AppTheme {
   name: string;
   emoji: string;
   cost: number; // stars to unlock (0 = free/default)
+  premium?: boolean; // requires premium subscription in addition to stars
   light: Record<string, string>;
   dark: Record<string, string>;
 }
@@ -143,6 +144,7 @@ export const APP_THEMES: AppTheme[] = [
     name: "Midnight Gold",
     emoji: "✨",
     cost: 12,
+    premium: true,
     light: {
       "--background": "45 30% 96%",
       "--card": "45 25% 100%",
@@ -183,6 +185,7 @@ export const APP_THEMES: AppTheme[] = [
     name: "Bubblegum Pop",
     emoji: "🍬",
     cost: 15,
+    premium: true,
     light: {
       "--background": "330 35% 97%",
       "--card": "330 25% 100%",
