@@ -102,6 +102,9 @@ const Index = () => {
   );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
+  const [showResetPinPrompt, setShowResetPinPrompt] = useState(false);
+  const [resetPinInput, setResetPinInput] = useState("");
+  const [resetPinError, setResetPinError] = useState("");
 
   const pinRequired = isPremium && hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
@@ -193,13 +196,36 @@ const Index = () => {
 
   const handleResetAttempt = useCallback(() => {
     if (pinRequired) return;
+    // If a parent PIN exists, always require it for Reset — even after the
+    // app has been unlocked — so kids can't tap Reset to refill their time.
+    if (hasPin()) {
+      setResetPinInput("");
+      setResetPinError("");
+      setShowResetPinPrompt(true);
+      return;
+    }
     if (hasHitZeroToday) {
       setShowResetConfirm(true);
     } else {
       reset();
       resetPushSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset, resetPushSent]);
+  }, [pinRequired, hasPin, hasHitZeroToday, reset, resetPushSent]);
+
+  const handleResetPinSubmit = useCallback(() => {
+    if (!verifyPin(resetPinInput)) {
+      setResetPinError("Wrong PIN");
+      setResetPinInput("");
+      return;
+    }
+    setShowResetPinPrompt(false);
+    if (hasHitZeroToday) {
+      setShowResetConfirm(true);
+    } else {
+      reset();
+      resetPushSent();
+    }
+  }, [resetPinInput, verifyPin, hasHitZeroToday, reset, resetPushSent]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
@@ -585,6 +611,40 @@ const Index = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmReset}>
               Reset anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showResetPinPrompt} onOpenChange={setShowResetPinPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Parent PIN required</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter the parent PIN to reset the timer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength={6}
+            value={resetPinInput}
+            onChange={(e) => {
+              setResetPinInput(e.target.value.replace(/\D/g, ""));
+              setResetPinError("");
+            }}
+            onKeyDown={(e) => e.key === "Enter" && handleResetPinSubmit()}
+            className="w-full h-12 rounded-xl border border-input bg-secondary px-4 text-center text-2xl tracking-[0.5em] font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder="••••"
+            autoFocus
+          />
+          {resetPinError && (
+            <p className="text-sm text-destructive text-center">{resetPinError}</p>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetPinSubmit}>
+              Unlock & Reset
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
