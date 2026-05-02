@@ -615,6 +615,40 @@ const Index = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={showResetPinPrompt} onOpenChange={setShowResetPinPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Parent PIN required</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter the parent PIN to reset the timer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength={6}
+            value={resetPinInput}
+            onChange={(e) => {
+              setResetPinInput(e.target.value.replace(/\D/g, ""));
+              setResetPinError("");
+            }}
+            onKeyDown={(e) => e.key === "Enter" && handleResetPinSubmit()}
+            className="w-full h-12 rounded-xl border border-input bg-secondary px-4 text-center text-2xl tracking-[0.5em] font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder="••••"
+            autoFocus
+          />
+          {resetPinError && (
+            <p className="text-sm text-destructive text-center">{resetPinError}</p>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetPinSubmit}>
+              Unlock & Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
