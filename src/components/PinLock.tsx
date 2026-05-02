@@ -35,9 +35,12 @@ export const PinLock: React.FC<PinLockProps> = ({
 
   if (!hasPin && mode === "idle") {
     return (
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-foreground font-medium">Parent PIN Lock</span>
-        <Button variant="secondary" size="sm" onClick={() => setMode("set")} className="rounded-full">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col">
+          <span className="text-sm text-foreground font-medium">Parent PIN Lock</span>
+          <span className="text-xs text-muted-foreground">So kids can't change limits or reset the timer.</span>
+        </div>
+        <Button variant="secondary" size="sm" onClick={() => setMode("set")} className="rounded-full shrink-0">
           <Lock className="w-3.5 h-3.5 mr-1" /> Set PIN
         </Button>
       </div>
