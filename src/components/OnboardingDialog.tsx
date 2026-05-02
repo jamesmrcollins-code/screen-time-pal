@@ -24,8 +24,8 @@ const steps = [
   },
   {
     icon: <Clock className="w-8 h-8 text-accent" />,
-    title: "Track Your Time",
-    desc: "Press play when you start using screens. Usage counts against both your daily and weekly limits at the same time.",
+    title: "Track Your Screen Time",
+    desc: "Press the 'Start' button when the screen time starts and the 'Stop' button when it finishes. Screen Time Pal will start deducting your screen usage from your daily and weekly limit.",
   },
   {
     icon: <Star className="w-8 h-8 text-timer-warning" />,
