@@ -19,8 +19,8 @@ interface Props {
 const steps = [
   {
     icon: <Timer className="w-8 h-8 text-primary" />,
-    title: "Set Your Limits",
-    desc: "Set a daily limit (e.g. 2 hours) and a weekly limit (e.g. 10 hours). The timer always counts down from whichever limit is lower — so if you've used most of your weekly time, you'll see that instead.",
+    title: "Set Your Limit",
+    desc: "Here, you can set both a Daily and a Weekly (overall) screen-time limit, for each user in your household. Screen Time Pal will count down from both limits simultaneously.",
   },
   {
     icon: <Clock className="w-8 h-8 text-accent" />,
