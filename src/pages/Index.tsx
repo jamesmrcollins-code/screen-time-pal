@@ -8,6 +8,7 @@ import {
 import { TimeSetter } from "@/components/TimeSetter";
 import { SwipeableTimerDisplay } from "@/components/SwipeableTimerDisplay";
 import { PushNotificationSettings } from "@/components/PushNotificationSettings";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { ProfileSelector } from "@/components/ProfileSelector";
 import { PinLock } from "@/components/PinLock";
@@ -379,14 +380,26 @@ const Index = () => {
             )}
 
             <div className="flex flex-col items-center gap-1">
-              <Button
-                variant={notifEnabled ? "secondary" : "outline"}
-                size="icon"
-                onClick={handleEnableNotifications}
-                className="rounded-full h-12 w-12"
-              >
-                <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={notifEnabled ? "secondary" : "outline"}
+                    size="icon"
+                    className="rounded-full h-12 w-12"
+                    title="Alert settings"
+                  >
+                    <Bell className={`w-5 h-5 ${notifEnabled ? "text-primary" : ""}`} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72" align="center">
+                  <PushNotificationSettings
+                    enabled={notifEnabled}
+                    settings={pushSettings}
+                    onUpdate={updatePushSettings}
+                    onEnable={handleEnableNotifications}
+                  />
+                </PopoverContent>
+              </Popover>
               <span className="text-[10px] text-muted-foreground font-medium">
                 {notifEnabled ? "Alerts on" : "Alerts"}
               </span>
@@ -532,14 +545,6 @@ const Index = () => {
                     hasPinSet={hasPin()}
                   />
                 </PremiumGate>
-              </div>
-
-              <div className="border-t border-border pt-5">
-                <PushNotificationSettings
-                  enabled={notifEnabled}
-                  settings={pushSettings}
-                  onUpdate={updatePushSettings}
-                />
               </div>
 
               <div className="border-t border-border pt-5">
