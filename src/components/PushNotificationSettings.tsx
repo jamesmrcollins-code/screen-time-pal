@@ -1,6 +1,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import type { PushSettings } from "@/hooks/usePushNotifier";
 import { Bell } from "lucide-react";
 
@@ -8,11 +9,10 @@ interface Props {
   enabled: boolean;
   settings: PushSettings;
   onUpdate: (partial: Partial<PushSettings>) => void;
+  onEnable?: () => void;
 }
 
-export const PushNotificationSettings: React.FC<Props> = ({ enabled, settings, onUpdate }) => {
-  if (!enabled) return null;
-
+export const PushNotificationSettings: React.FC<Props> = ({ enabled, settings, onUpdate, onEnable }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-1">
@@ -20,11 +20,23 @@ export const PushNotificationSettings: React.FC<Props> = ({ enabled, settings, o
         <h3 className="text-base font-bold text-foreground">Alert Timing</h3>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Choose when to receive browser push alerts.
-      </p>
-
-      <div className="space-y-3">
+      {!enabled ? (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Enable browser notifications to get alerted before your screen time runs out.
+          </p>
+          {onEnable && (
+            <Button size="sm" onClick={onEnable} className="w-full">
+              Enable alerts
+            </Button>
+          )}
+        </div>
+      ) : (
+        <>
+        <p className="text-xs text-muted-foreground">
+          Choose when to receive browser push alerts.
+        </p>
+        <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="push-5" className="text-sm text-foreground">Alert at 5 minutes</Label>
           <Switch
@@ -49,7 +61,9 @@ export const PushNotificationSettings: React.FC<Props> = ({ enabled, settings, o
             onCheckedChange={(v) => onUpdate({ notifyAtZero: v })}
           />
         </div>
-      </div>
+        </div>
+        </>
+      )}
     </div>
   );
 };
