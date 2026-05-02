@@ -367,14 +367,14 @@ const Index = () => {
                     pause();
                   }
                 }}
-                className={`h-16 w-16 rounded-full p-0 ${pinRequired ? "opacity-50" : ""}`}
+                className={`h-16 px-8 rounded-full font-bold text-base ${pinRequired ? "opacity-50" : ""}`}
                 disabled={pinRequired}
               >
-                <Pause className="w-6 h-6" />
+                Stop
               </Button>
             ) : (
-              <Button variant="timer" size="lg" onClick={start} className="h-16 w-16 rounded-full p-0">
-                <Play className="w-6 h-6 ml-1" />
+              <Button variant="timer" size="lg" onClick={start} className="h-16 px-8 rounded-full font-bold text-base">
+                Start
               </Button>
             )}
 
