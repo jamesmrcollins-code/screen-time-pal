@@ -102,6 +102,9 @@ const Index = () => {
   );
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [hasHitZeroToday, setHasHitZeroToday] = useState(false);
+  const [showResetPinPrompt, setShowResetPinPrompt] = useState(false);
+  const [resetPinInput, setResetPinInput] = useState("");
+  const [resetPinError, setResetPinError] = useState("");
 
   const pinRequired = isPremium && hasPin() && !isUnlocked;
   const fallbackProfileId = focusedProfileId ?? activeId ?? profiles[0]?.id ?? null;
@@ -193,13 +196,36 @@ const Index = () => {
 
   const handleResetAttempt = useCallback(() => {
     if (pinRequired) return;
+    // If a parent PIN exists, always require it for Reset — even after the
+    // app has been unlocked — so kids can't tap Reset to refill their time.
+    if (hasPin()) {
+      setResetPinInput("");
+      setResetPinError("");
+      setShowResetPinPrompt(true);
+      return;
+    }
     if (hasHitZeroToday) {
       setShowResetConfirm(true);
     } else {
       reset();
       resetPushSent();
     }
-  }, [pinRequired, hasHitZeroToday, reset, resetPushSent]);
+  }, [pinRequired, hasPin, hasHitZeroToday, reset, resetPushSent]);
+
+  const handleResetPinSubmit = useCallback(() => {
+    if (!verifyPin(resetPinInput)) {
+      setResetPinError("Wrong PIN");
+      setResetPinInput("");
+      return;
+    }
+    setShowResetPinPrompt(false);
+    if (hasHitZeroToday) {
+      setShowResetConfirm(true);
+    } else {
+      reset();
+      resetPushSent();
+    }
+  }, [resetPinInput, verifyPin, hasHitZeroToday, reset, resetPushSent]);
 
   const handleConfirmReset = useCallback(() => {
     markResetDay();
