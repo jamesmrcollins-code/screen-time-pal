@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { Capacitor } from "@capacitor/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const isNativeApp = Capacitor.isNativePlatform();
   const navigate = useNavigate();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -72,7 +74,7 @@ const Auth = () => {
         </div>
 
         {/* OAuth */}
-        {mode !== "forgot" && (
+        {mode !== "forgot" && !isNativeApp && (
           <div className="space-y-3">
             <Button
               variant="outline"
