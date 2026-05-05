@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'ScreenTime Pal',
   webDir: 'dist',
   server: {
-    url: 'https://2e3f9e18-f419-46d1-ae91-ca099aee18b8.lovableproject.com?forceHideBadge=true',
+    url: 'https://www.screentimepal.io?forceHideBadge=true',
     cleartext: true
   }
 };
