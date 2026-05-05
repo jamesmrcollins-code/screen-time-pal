@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.2e3f9e18f41946d1ae91ca099aee18b8',
+  appId: 'app.lovable.screentimepal',
   appName: 'ScreenTime Pal',
   webDir: 'dist',
   server: {
