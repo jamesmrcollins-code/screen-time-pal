@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "ios:reset": "rm -rf ios && npm run build && npx cap add ios && npx cap sync ios && npx cap run ios"
+    "ios:reset": "rm -rf ios && npm run build && npx cap add ios && npx cap sync ios && xcrun simctl uninstall booted com.jamescollins.screentimepal >/dev/null 2>&1 || true && npx cap run ios",
+    "ios:clean": "rm -rf ios && npm run build && npx cap add ios && npx cap sync ios"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
